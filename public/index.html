@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breda The Netherlands Roleplay</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-city"></i> Breda The Netherlands Roleplay</h1>
+            <nav>
+                <a href="/" class="active"><i class="fas fa-home"></i> Home</a>
+                <a href="/trainingen.html"><i class="fas fa-graduation-cap"></i> Trainingen</a>
+                <a href="/admin.html"><i class="fas fa-user-shield"></i> Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="welcome">
+            <h2><i class="fas fa-door-open"></i> Welkom</h2>
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="post-author"><i class="fas fa-user"></i> Server Management</span>
+                    <span class="post-date"><i class="far fa-calendar"></i> <span id="current-date"></span></span>
+                </div>
+                <p>Welkom op de officiële website van Breda The Netherlands Roleplay!</p>
+                <p>Hier vind je alle informatie over trainingen, regels en updates voor onze server.</p>
+            </div>
+        </section>
+
+        <section class="training-overview">
+            <h2><i class="fas fa-clock"></i> Komende Trainingen</h2>
+            <div id="training-list" class="training-list">
+                <p><i class="fas fa-spinner fa-spin"></i> Trainingen worden geladen...</p>
+            </div>
+        </section>
+
+        <section class="server-info">
+            <h2><i class="fas fa-info-circle"></i> Server Informatie</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <i class="fas fa-users"></i>
+                    <h3>Actieve Leden</h3>
+                    <p class="info-value">125+</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <h3>Trainingen deze week</h3>
+                    <p class="info-value" id="weekly-trainings">3</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Online Staff</h3>
+                    <p class="info-value">8</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Breda The Netherlands Roleplay. Alle rechten voorbehouden.</p>
+            <p class="footer-links">
+                <a href="#"><i class="fab fa-discord"></i> Discord</a>
+                |
+                <a href="#"><i class="fas fa-book"></i> Regels</a>
+                |
+                <a href="#"><i class="fas fa-question-circle"></i> Support</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
