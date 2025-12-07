@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Breda Roleplay</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <style>
+        .admin-header {
+            background: linear-gradient(90deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .admin-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .admin-sidebar {
+            background: #f5f5f5;
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
+            width: 250px;
+            position: fixed;
+        }
+        
+        .admin-content {
+            margin-left: 250px;
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
+            background: #fafafa;
+        }
+        
+        .admin-menu {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .admin-menu li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .admin-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .admin-menu a:hover, .admin-menu a.active {
+            background: white;
+            color: #1a237e;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .card-icon {
+            font-size: 2rem;
+            color: #1a237e;
+            margin-bottom: 1rem;
+        }
+        
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1a237e;
+            margin: 0.5rem 0;
+        }
+        
+        .logout-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .logout-btn:hover {
+            background: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <nav class="admin-nav">
+            <div class="admin-logo">
+                <i class="fas fa-user-shield"></i>
+                <span>Admin Dashboard</span>
+            </div>
+            <div class="admin-user" id="admin-user-info">
+                <!-- Wordt ingevuld door JavaScript -->
+            </div>
+        </nav>
+    </header>
+    
+    <!-- Admin Sidebar -->
+    <div class="admin-sidebar">
+        <ul class="admin-menu">
+            <li><a href="/admin/dashboard.html" class="active">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a></li>
+            <li><a href="/admin/trainingen.html">
+                <i class="fas fa-graduation-cap"></i> Trainingen
+            </a></li>
+            <li><a href="/admin/gebruikers.html">
+                <i class="fas fa-users"></i> Gebruikers
+            </a></li>
+            <li><a href="#">
+                <i class="fas fa-cog"></i> Instellingen
+            </a></li>
+            <li><a href="/">
+                <i class="fas fa-globe"></i> Website
+            </a></li>
+            <li><a href="#" id="logout-btn" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Uitloggen
+            </a></li>
+        </ul>
+    </div>
+    
+    <!-- Admin Content -->
+    <div class="admin-content">
+        <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+        <p>Welkom in het admin panel van Breda The Netherlands Roleplay.</p>
+        
+        <div class="dashboard-cards">
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>Trainingen</h3>
+                <div class="card-value" id="training-count">0</div>
+                <p>Totaal geplande trainingen</p>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Gebruikers</h3>
+                <div class="card-value" id="user-count">0</div>
+                <p>Geregistreerde gebruikers</p>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Deze Week</h3>
+                <div class="card-value" id="week-count">0</div>
+                <p>Trainingen gepland</p>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Actief</h3>
+                <div class="card-value" id="active-count">0</div>
+                <p>Actieve gebruikers</p>
+            </div>
+        </div>
+        
+        <div class="recent-activities">
+            <h2><i class="fas fa-history"></i> Recente Activiteiten</h2>
+            <div id="activities-list">
+                <p>Activiteiten worden geladen...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Controleer of gebruiker is ingelogd
+            const user = netlifyIdentity.currentUser();
+            
+            if (!user) {
+                // Niet ingelogd, redirect naar login
+                window.location.href = '/admin/login.html';
+                return;
+            }
+            
+            // Toon gebruiker info
+            document.getElementById('admin-user-info').innerHTML = `
+                <div class="admin-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <strong>${user.user_metadata.full_name || user.email}</strong><br>
+                    <small>${user.email}</small>
+                </div>
+            `;
+            
+            // Logout knop
+            document.getElementById('logout-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                netlifyIdentity.logout();
+                window.location.href = '/admin/login.html';
+            });
+            
+            // Laad dashboard data
+            loadDashboardData();
+        });
+        
+        async function loadDashboardData() {
+            try {
+                // Haal trainingen op
+                const response = await fetch('https://bredathenetherlands.netlify.app/.netlify/functions/add-training');
+                const trainingen = await response.json();
+                
+                // Update counts
+                document.getElementById('training-count').textContent = trainingen.length || 0;
+                
+                // Trainingen deze week
+                const now = new Date();
+                const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                const dezeWeek = trainingen.filter(t => {
+                    try {
+                        const [dag, maand, jaar] = t.datum.split('/').map(Number);
+                        const datum = new Date(jaar, maand - 1, dag);
+                        return datum >= now && datum <= nextWeek;
+                    } catch {
+                        return false;
+                    }
+                }).length;
+                
+                document.getElementById('week-count').textContent = dezeWeek;
+                
+            } catch (error) {
+                console.error('Fout bij laden dashboard:', error);
+            }
+        }
+    </script>
+</body>
+</html>
