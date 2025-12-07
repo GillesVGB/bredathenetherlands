@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainingen - Breda The Netherlands Roleplay</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-city"></i> Breda The Netherlands Roleplay</h1>
+            <nav>
+                <a href="/"><i class="fas fa-home"></i> Home</a>
+                <a href="/trainingen.html" class="active"><i class="fas fa-graduation-cap"></i> Trainingen</a>
+                <a href="/admin.html"><i class="fas fa-user-shield"></i> Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1><i class="fas fa-graduation-cap"></i> Trainingen Overzicht</h1>
+        
+        <section class="training-actions">
+            <h2><i class="fas fa-plus-circle"></i> Nieuwe Training Plannen</h2>
+            <p>Discord commando: <code>!training &lt;datum&gt; &lt;tijd&gt; &lt;trainer&gt; &lt;onderwerp&gt;</code></p>
+        </section>
+
+        <section class="upcoming-trainings">
+            <h2><i class="fas fa-calendar-alt"></i> Komende Trainingen</h2>
+            <div id="trainings-list">
+                <div class="training-card">
+                    <h3><i class="fas fa-user-tie"></i> Politie Basis Training</h3>
+                    <p><i class="far fa-calendar"></i> <strong>Datum:</strong> 10/12/2025</p>
+                    <p><i class="far fa-clock"></i> <strong>Tijd:</strong> 20:00</p>
+                    <p><i class="fas fa-user"></i> <strong>Trainer:</strong> John_Doe</p>
+                    <p><i class="fas fa-book"></i> <strong>Onderwerp:</strong> Basis politiewerk, verkeerscontroles, procedure</p>
+                </div>
+                
+                <div class="training-card">
+                    <h3><i class="fas fa-ambulance"></i> EHBO Gevorderd</h3>
+                    <p><i class="far fa-calendar"></i> <strong>Datum:</strong> 12/12/2025</p>
+                    <p><i class="far fa-clock"></i> <strong>Tijd:</strong> 19:30</p>
+                    <p><i class="fas fa-user"></i> <strong>Trainer:</strong> Medic_Sarah</p>
+                    <p><i class="fas fa-book"></i> <strong>Onderwerp:</strong> Gevorderde EHBO, trauma care, team coordination</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="past-trainings">
+            <h2><i class="fas fa-history"></i> Afgelopen Trainingen</h2>
+            <div id="past-trainings-list">
+                <p>Laatste trainingen worden hier geladen...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Breda The Netherlands Roleplay. Alle rechten voorbehouden.</p>
+            <p>Trainingen worden via Discord bot toegevoegd en automatisch gesynchroniseerd.</p>
+        </div>
+    </footer>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
