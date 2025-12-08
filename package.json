@@ -1,25 +1,15 @@
 {
-  "name": "breda-roleplay-website",
+  "name": "bredathenetherlands",
   "version": "2.0.0",
-  "description": "Moderne website voor Breda The Netherlands Roleplay met Discord bot integratie",
+  "description": "Website met Discord bot integratie voor Breda The Netherlands Roleplay",
   "homepage": "https://bredathenetherlands.netlify.app",
   "repository": {
     "type": "git",
     "url": "https://github.com/GillesVGB/bredathenetherlands.git"
   },
-  "bugs": {
-    "url": "https://github.com/GillesVGB/bredathenetherlands/issues"
-  },
   "author": "Gilles VGB",
   "license": "MIT",
-  "keywords": [
-    "roleplay",
-    "breda",
-    "gta",
-    "discord",
-    "training",
-    "management"
-  ],
+  "private": true,
   "scripts": {
     "dev": "echo 'Run: netlify dev'"
   },
