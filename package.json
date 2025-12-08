@@ -23,9 +23,6 @@
   "scripts": {
     "dev": "echo 'Run: netlify dev'"
   },
-  "dependencies": {
-    "node-fetch": "^2.6.7"
-  },
   "engines": {
     "node": ">=18.0.0"
   }
