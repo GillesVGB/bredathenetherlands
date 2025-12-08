@@ -4,153 +4,176 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Breda Roleplay</title>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .logo {
+            font-size: 4rem;
+            color: #1a237e;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            color: #1a237e;
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+cd ~/desktop/bredathenetherlands
+
+# Maak eerst de dashboard.html die Identity gebruikt
+cat > public/admin/dashboard.html << 'EOF'
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Breda Roleplay</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+        }
+        
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
         }
         
-        .login-card {
+        .page-header {
+            background: linear-gradient(90deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .login-required {
+            background: #ffebee;
+            border: 2px solid #f44336;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+        
+        .login-required i {
+            font-size: 3rem;
+            color: #f44336;
+            margin-bottom: 1rem;
+        }
+        
+        .login-btn {
+            background: #1a237e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .login-btn:hover {
+            background: #283593;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
             background: white;
-            padding: 2.5rem;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 500px;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             text-align: center;
         }
         
-        .debug-info {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            text-align: left;
-            font-family: monospace;
-            font-size: 0.9rem;
-            max-height: 200px;
-            overflow-y: auto;
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 2rem;
         }
         
-        .debug-info h4 {
-            margin-top: 0;
-            color: #1a237e;
+        .action-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-decoration: none;
+            color: #333;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div style="font-size: 3rem; color: #1a237e; margin-bottom: 1rem;">
-                <i class="fas fa-user-shield"></i>
-            </div>
-            <h1>Admin Login</h1>
-            <p>Breda The Netherlands Roleplay Admin Panel</p>
-            
-            <div id="netlify-identity-container">
-                <button onclick="login()" style="background: #1a237e; color: white; border: none; padding: 12px 24px; border-radius: 5px; font-size: 1rem; cursor: pointer; margin: 1rem 0;">
-                    <i class="fas fa-sign-in-alt"></i> Open Login
-                </button>
-            </div>
-            
-            <div class="debug-info">
-                <h4>Debug Info:</h4>
-                <div id="debug-log">
-                    Loading...
-                </div>
-            </div>
-            
-            <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee; font-size: 0.9rem; color: #777;">
-                <p><strong>Problemen?</strong> Clear je browser cache (F12 → Application → Clear Storage)</p>
-            </div>
-            
-            <a href="/" style="display: inline-block; margin-top: 1rem; color: #1a237e; text-decoration: none;">
-                <i class="fas fa-arrow-left"></i> Terug naar website
-            </a>
+    <div class="admin-container">
+        <div class="page-header">
+            <h1><i class="fas fa-user-shield"></i> Admin Dashboard</h1>
+            <p>Breda The Netherlands Roleplay - Beheerpaneel</p>
         </div>
-    </div>
-    
-    <script>
-        let debugLog = document.getElementById('debug-log');
         
-        function log(message) {
-            debugLog.innerHTML += `[${new Date().toLocaleTimeString()}] ${message}<br>`;
-            console.log(message);
-        }
+        <div id="login-required" class="login-required">
+            <i class="fas fa-lock"></i>
+            <h2>Login vereist</h2>
+            <p>Je moet ingelogd zijn om het dashboard te bekijken.</p>
+            <p><strong>Klik op de knop hieronder om in te loggen met Netlify Identity.</strong></p>
+            <button id="login-button" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Inloggen met Netlify
+            </button>
+            <div style="margin-top: 2rem; font-size: 0.9rem; color: #666;">
+                <p><i class="fas fa-info-circle"></i> Gebruik het emailadres dat je hebt geregistreerd voor Netlify.</p>
+            </div>
+        </div>
         
-        function login() {
-            log('Opening Netlify Identity modal...');
-            if (window.netlifyIdentity) {
-                netlifyIdentity.open('login');
-            } else {
-                log('ERROR: netlifyIdentity not loaded');
-            }
-        }
-        
-        // Netlify Identity event handlers
-        if (window.netlifyIdentity) {
-            log('Netlify Identity loaded');
-            
-            netlifyIdentity.on('init', user => {
-                log(`Identity initialized. User: ${user ? 'Logged in' : 'Not logged in'}`);
-                if (user) {
-                    log(`User email: ${user.email}`);
-                    log('Redirecting to dashboard...');
-                    setTimeout(() => {
-                        window.location.href = '/admin/dashboard.html';
-                    }, 1000);
-                }
-            });
-            
-            netlifyIdentity.on('login', user => {
-                log(`Login successful: ${user.email}`);
-                log('User token: ' + (user.token ? 'Present' : 'Missing'));
-                log('Redirecting in 2 seconds...');
-                setTimeout(() => {
-                    window.location.href = '/admin/dashboard.html';
-                }, 2000);
-            });
-            
-            netlifyIdentity.on('logout', () => {
-                log('User logged out');
-            });
-            
-            netlifyIdentity.on('error', err => {
-                log(`Identity error: ${err.message || err}`);
-            });
-            
-            // Initialize
-            log('Initializing Netlify Identity...');
-            netlifyIdentity.init();
-            
-        } else {
-            log('ERROR: Netlify Identity widget script not loaded properly');
-            log('Check: https://identity.netlify.com/v1/netlify-identity-widget.js');
-        }
-        
-        // Test Identity endpoint
-        fetch('https://bredathenetherlands.netlify.app/.netlify/identity')
-            .then(response => {
-                log(`Identity endpoint status: ${response.status}`);
-                return response.text();
-            })
-            .then(text => {
-                if (text.includes('gotrue')) {
-                    log('Identity endpoint: OK');
-                } else {
-                    log('Identity endpoint: Unexpected response');
-                }
-            })
-            .catch(error => {
-                log(`Identity endpoint error: ${error.message}`);
-            });
-    </script>
-</body>
-</html>
+        <div id="dashboard-content" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>Welkom, <span id="user-email"></span>!</h2>
+                <button id="logout-button" class="login-btn" style="background: #f44336;">
+
+
+
