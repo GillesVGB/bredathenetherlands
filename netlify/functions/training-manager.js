@@ -32,10 +32,14 @@ exports.handler = async (event) => {
         datum: t.datum,
         tijd: t.tijd,
         trainer: t.trainer,
+        dienst: t.dienst || "Ambulance",  // Default als niet gevuld
+        co_host: t.co_host || null,
+        helpers: t.helpers || null,
         status: t.status,
         status_text: t.status_text,
         canJoin: t.status === 'in_progress' || t.status === 'not_started',
         van_discord: t.van_discord || false
+        
       }));
       
       return {
