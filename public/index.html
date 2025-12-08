@@ -38,54 +38,22 @@
                     <a href="/trainingen.html" class="btn btn-primary">
                         <i class="fas fa-graduation-cap"></i> Bekijk Trainingen
                     </a>
-                    <a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank" class="btn btn-secondary">
-                        <i class="fab fa-github"></i> View on GitHub
+                    <a href="/admin/dashboard.html" class="btn btn-secondary">
+                        <i class="fas fa-user-shield"></i> Admin Dashboard
                     </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- GitHub Info -->
-    <section class="github-info">
-        <div class="container">
-            <h2><i class="fab fa-github"></i> GitHub Repository</h2>
-            <div class="github-card">
-                <div class="github-header">
-                    <i class="fab fa-github"></i>
-                    <div>
-                        <h3>GillesVGB/bredathenetherlands</h3>
-                        <p>🌐 Breda Roleplay Website & Discord Bot</p>
-                    </div>
-                </div>
-                
-                <div class="github-links">
-                    <a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank" class="github-link">
-                        <i class="fas fa-code"></i> Repository
-                    </a>
-                    <a href="https://github.com/GillesVGB/bredathenetherlands/issues" target="_blank" class="github-link">
-                        <i class="fas fa-bug"></i> Issues
-                    </a>
-                    <a href="https://github.com/GillesVGB/bredathenetherlands/commits/main" target="_blank" class="github-link">
-                        <i class="fas fa-history"></i> Commits
-                    </a>
-                    <a href="https://github.com/GillesVGB/bredathenetherlands/network" target="_blank" class="github-link">
-                        <i class="fas fa-code-branch"></i> Network
-                    </a>
-                </div>
-                
-                <div class="github-features">
-                    <h4>Wat is er te vinden?</h4>
-                    <ul>
-                        <li><i class="fas fa-check"></i> Complete website code</li>
-                        <li><i class="fas fa-check"></i> Discord bot voor trainingen</li>
-                        <li><i class="fas fa-check"></i> Netlify Functions API</li>
-                        <li><i class="fas fa-check"></i> Admin dashboard systeem</li>
-                    </ul>
-                </div>
-            </div>
+    <!-- Info -->
+    <div class="container" style="padding: 2rem 0; max-width: 800px;">
+        <div style="background: #e3f2fd; padding: 2rem; border-radius: 10px; margin: 2rem 0;">
+            <h3><i class="fas fa-info-circle"></i> Admin Access</h3>
+            <p>Klik op "Admin Dashboard" om in te loggen met Netlify Identity.</p>
+            <p><strong>Let op:</strong> Je moet eerst uitgenodigd zijn als gebruiker in Netlify Identity.</p>
         </div>
-    </section>
+    </div>
 
     <!-- Footer -->
     <footer class="main-footer">
@@ -93,103 +61,30 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Breda Roleplay</h3>
-                    <p>Website gemaakt door Gilles VGB</p>
+                    <p>Website met Netlify Identity login</p>
                 </div>
-                
                 <div class="footer-section">
-                    <h3>GitHub Links</h3>
-                    <ul>
-                        <li><a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank">Repository</a></li>
-                        <li><a href="https://github.com/GillesVGB/bredathenetherlands/issues" target="_blank">Issues</a></li>
-                        <li><a href="https://github.com/GillesVGB/bredathenetherlands/pulls" target="_blank">Pull Requests</a></li>
-                        <li><a href="https://github.com/GillesVGB" target="_blank">GillesVGB Profile</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
+                    <h3>Links</h3>
                     <ul>
                         <li><a href="/">Home</a></li>
                         <li><a href="/trainingen.html">Trainingen</a></li>
                         <li><a href="/admin/dashboard.html">Admin</a></li>
                     </ul>
                 </div>
+                <div class="footer-section">
+                    <h3>GitHub</h3>
+                    <a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank">
+                        <i class="fab fa-github"></i> Repository
+                    </a>
+                </div>
             </div>
-            
             <div class="footer-bottom">
-                <p>&copy; 2024 Breda Roleplay. Source code on <a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank">GitHub</a>.</p>
-                <p>Deployed on <a href="https://netlify.app" target="_blank">Netlify</a></p>
+                <p>&copy; 2024 Breda Roleplay | <a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank">GitHub</a></p>
             </div>
         </div>
     </footer>
 
     <style>
-        .github-info {
-            padding: 4rem 0;
-            background: #f8f9fa;
-        }
-        
-        .github-card {
-            background: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-width: 800px;
-            margin: 2rem auto;
-        }
-        
-        .github-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .github-header i {
-            font-size: 3rem;
-            color: #24292e;
-        }
-        
-        .github-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-        
-        .github-link {
-            padding: 1rem;
-            background: #f6f8fa;
-            border: 1px solid #d0d7de;
-            border-radius: 6px;
-            text-decoration: none;
-            color: #24292e;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        
-        .github-link:hover {
-            background: #0969da;
-            color: white;
-            border-color: #0969da;
-        }
-        
-        .github-features ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .github-features li {
-            padding: 0.5rem 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .github-features i {
-            color: #2da44e;
-        }
-        
         .github-btn {
             background: #24292e;
             color: white;
@@ -205,10 +100,35 @@
             background: #30363d;
         }
         
-        @media (max-width: 768px) {
-            .github-links {
-                grid-template-columns: 1fr;
-            }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #1a237e;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #283593;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #43a047;
+            transform: translateY(-2px);
         }
     </style>
 </body>
