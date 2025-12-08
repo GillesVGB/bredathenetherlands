@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainingen Beheer - Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header - ZELFDE ALS ANDERE PAGINA'S */
+        header {
+            background: linear-gradient(90deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        nav a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        nav a.active {
+            background: rgba(255,255,255,0.2);
+            font-weight: 500;
+        }
+        
+        /* Admin Content */
+        .admin-content {
+            padding: 2rem 0;
+            min-height: 70vh;
+        }
+        
+        .page-header {
+            background: linear-gradient(90deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .page-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 1rem;
+        }
+        
+        .header-actions a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-actions a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Training Table */
+        .training-table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #1a237e;
+            color: white;
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tbody tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .discord-badge {
+            background: #5865F2;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 5px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn {
+            padding: 6px 12px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #d32f2f;
+        }
+        
+        .btn-refresh {
+            background: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-refresh:hover {
+            background: #43a047;
+        }
+        
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1a237e;
+            margin: 0.5rem 0;
+        }
+        
+        /* Loading & States */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        /* Login Required */
+        .login-required {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin: 2rem 0;
+        }
+        
+        /* Footer */
+        footer {
+            background: #1a237e;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        footer .container {
+            text-align: center;
+        }
+        
+        footer p {
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            header .container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER ZELFDE ALS ANDERE PAGINA'S -->
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-city"></i> Breda The Netherlands Roleplay</h1>
+            <nav>
+                <a href="/"><i class="fas fa-home"></i> Home</a>
+                <a href="/trainingen.html"><i class="fas fa-graduation-cap"></i> Trainingen</a>
+                <a href="/admin/dashboard.html"><i class="fas fa-user-shield"></i> Dashboard</a>
+                <a href="/admin/beheer-trainingen.html" class="active"><i class="fas fa-cog"></i> Beheer</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="admin-content">
+            <!-- Login Check -->
+            <div id="loginCheck">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Controleren login status...
+                </div>
+            </div>
+            
+            <!-- Admin Content (hidden until login) -->
+            <div id="adminContent" style="display: none;">
+                <div class="page-header">
+                    <h1><i class="fas fa-graduation-cap"></i> Trainingen Beheer</h1>
+                    <p>Beheer alle trainingen van Breda The Netherlands Roleplay</p>
+                    <div class="header-actions">
+                        <a href="/admin/dashboard.html">
+                            <i class="fas fa-arrow-left"></i> Terug naar Dashboard
+                        </a>
+                        <a href="/trainingen.html" target="_blank">
+                            <i class="fas fa-eye"></i> Bekijk Publieke Pagina
+                        </a>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>Alle Trainingen</h2>
+                    <button onclick="loadTrainings()" class="btn btn-refresh">
+                        <i class="fas fa-sync-alt"></i> Vernieuwen
+                    </button>
+                </div>
+                
+                <!-- Stats -->
+                <div class="stats">
+                    <div class="stat-card">
+                        <i class="fas fa-graduation-cap"></i>
+                        <div class="stat-number" id="totalCount">0</div>
+                        <p>Totaal Trainingen</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fab fa-discord"></i>
+                        <div class="stat-number" id="discordCount">0</div>
+                        <p>Via Discord</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <div id="lastUpdate">-</div>
+                        <p>Laatste update</p>
+                    </div>
+                </div>
+                
+                <!-- Training Table -->
+                <div class="training-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Onderwerp</th>
+                                <th>Datum & Tijd</th>
+                                <th>Trainer</th>
+                                <th>Toegevoegd door</th>
+                                <th>Acties</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trainingsTable">
+                            <tr>
+                                <td colspan="6" class="loading">
+                                    <i class="fas fa-spinner fa-spin"></i> Trainingen laden...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Info Box -->
+                <div style="background: #e8f5e9; padding: 1.5rem; border-radius: 10px; border-left: 4px solid #4caf50;">
+                    <h3><i class="fas fa-info-circle"></i> Info</h3>
+                    <p>Trainingen worden automatisch bijgewerkt. Klik op "Vernieuwen" om de laatste data te zien.</p>
+                    <p><strong>Opmerking:</strong> Verwijderen van trainingen is tijdelijk uitgeschakeld voor stabiliteit.</p>
+                </div>
+            </div>
+            
+            <!-- Login Required Message -->
+            <div id="loginRequired" class="login-required" style="display: none;">
+                <h2><i class="fas fa-lock"></i> Login Vereist</h2>
+                <p>Je moet ingelogd zijn om deze pagina te bekijken.</p>
+                <p>Ga naar het <a href="/admin/dashboard.html">Admin Dashboard</a> om in te loggen.</p>
+                <div style="margin-top: 2rem;">
+                    <a href="/admin/dashboard.html" style="padding: 12px 24px; background: #1a237e; color: white; text-decoration: none; border-radius: 5px; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-sign-in-alt"></i> Naar Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER ZELFDE ALS ANDERE PAGINA'S -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Breda The Netherlands Roleplay. Alle rechten voorbehouden.</p>
+            <p>Admin panel - Trainingen beheer</p>
+        </div>
+    </footer>
+
+    <script>
+        // Check login status
+        function checkLogin() {
+            const loginCheck = document.getElementById('loginCheck');
+            const adminContent = document.getElementById('adminContent');
+            const loginRequired = document.getElementById('loginRequired');
+            
+            if (!window.netlifyIdentity) {
+                loginCheck.style.display = 'none';
+                loginRequired.style.display = 'block';
+                return;
+            }
+            
+            netlifyIdentity.on('init', user => {
+                loginCheck.style.display = 'none';
+                
+                if (user) {
+                    adminContent.style.display = 'block';
+                    loadTrainings();
+                } else {
+                    loginRequired.style.display = 'block';
+                }
+            });
+            
+            netlifyIdentity.init();
+        }
+        
+        // Load trainings
+        async function loadTrainings() {
+            try {
+                const response = await fetch('https://bredathenetherlands.netlify.app/.netlify/functions/add-training');
+                const trainingen = await response.json();
+                
+                const tableBody = document.getElementById('trainingsTable');
+                const totalCount = document.getElementById('totalCount');
+                const discordCount = document.getElementById('discordCount');
+                const lastUpdate = document.getElementById('lastUpdate');
+                
+                if (!trainingen || trainingen.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <i class="fas fa-inbox"></i> Geen trainingen gevonden.
+                            </td>
+                        </tr>
+                    `;
+                    totalCount.textContent = '0';
+                    discordCount.textContent = '0';
+                    return;
+                }
+                
+                // Sort by date (newest first)
+                const gesorteerd = trainingen.sort((a, b) => {
+                    try {
+                        const [dagA, maandA, jaarA] = a.datum.split('/').map(Number);
+                        const [dagB, maandB, jaarB] = b.datum.split('/').map(Number);
+                        const datumA = new Date(jaarA, maandA - 1, dagA);
+                        const datumB = new Date(jaarB, maandB - 1, dagB);
+                        return datumB - datumA;
+                    } catch {
+                        return 0;
+                    }
+                });
+                
+                // Display trainings
+                let html = '';
+                gesorteerd.forEach((training, index) => {
+                    html += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>
+                                ${training.onderwerp}
+                                ${training.van_discord ? '<span class="discord-badge"><i class="fab fa-discord"></i> Discord</span>' : ''}
+                            </td>
+                            <td>${training.datum} om ${training.tijd}</td>
+                            <td>${training.trainer}</td>
+                            <td>${training.toegevoegd_door || 'Onbekend'}</td>
+                            <td class="actions">
+                                <button class="btn btn-delete" onclick="deleteTraining(${index})" title="Verwijder training">
+                                    <i class="fas fa-trash"></i> Verwijder
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tableBody.innerHTML = html;
+                
+                // Update stats
+                totalCount.textContent = trainingen.length;
+                const discordTrainingen = trainingen.filter(t => t.van_discord).length;
+                discordCount.textContent = discordTrainingen;
+                lastUpdate.textContent = new Date().toLocaleTimeString('nl-BE');
+                
+            } catch (error) {
+                console.error('Fout bij laden:', error);
+                document.getElementById('trainingsTable').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state" style="color: #f44336;">
+                            <i class="fas fa-exclamation-triangle"></i> Fout bij laden trainingen.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // Delete training (placeholder - zou een Netlify Function moeten aanroepen)
+        function deleteTraining(index) {
+            if (confirm(`Weet je zeker dat je training #${index + 1} wilt verwijderen?\n\nDeze functionaliteit werkt momenteel alleen lokaal.`)) {
+                alert(`Training #${index + 1} zou verwijderd worden.\n\nVoor volledige functionaliteit moet een Netlify Function gemaakt worden.`);
+                // Hier zou een fetch naar een DELETE endpoint moeten komen
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLogin();
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                if (document.getElementById('adminContent').style.display !== 'none') {
+                    loadTrainings();
+                }
+            }, 30000);
+        });
+    </script>
+</body>
+</html>

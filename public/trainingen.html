@@ -6,15 +6,222 @@
     <title>Trainingen - Breda The Netherlands Roleplay</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header - ZELFDE ALS HOME */
+        header {
+            background: linear-gradient(90deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        nav a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        nav a.active {
+            background: rgba(255,255,255,0.2);
+            font-weight: 500;
+        }
+        
+        /* Main Content */
+        main {
+            padding: 2rem 0;
+            min-height: 70vh;
+        }
+        
+        main h1 {
+            color: #1a237e;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Sections */
+        section {
+            margin-bottom: 3rem;
+        }
+        
+        section h2 {
+            color: #1a237e;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Discord Command */
+        .discord-command {
+            background: #e8f5e9;
+            padding: 2rem;
+            border-radius: 10px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .discord-command code {
+            background: #1a237e;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        
+        /* Training Cards */
+        #trainings-list, #past-trainings-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .training-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 4px solid #1a237e;
+            transition: transform 0.2s;
+        }
+        
+        .training-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .training-card h3 {
+            color: #1a237e;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .training-card p {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .training-card i {
+            color: #666;
+            width: 20px;
+        }
+        
+        /* Footer - ZELFDE ALS HOME */
+        footer {
+            background: #1a237e;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        footer .container {
+            text-align: center;
+        }
+        
+        footer p {
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            grid-column: 1 / -1;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            background: #f9f9f9;
+            border-radius: 10px;
+            grid-column: 1 / -1;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            header .container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            #trainings-list, #past-trainings-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- HEADER ZELFDE ALS HOME -->
     <header>
         <div class="container">
             <h1><i class="fas fa-city"></i> Breda The Netherlands Roleplay</h1>
             <nav>
                 <a href="/"><i class="fas fa-home"></i> Home</a>
                 <a href="/trainingen.html" class="active"><i class="fas fa-graduation-cap"></i> Trainingen</a>
-                <a href="/admin.html"><i class="fas fa-user-shield"></i> Admin</a>
+                <a href="/admin/dashboard.html"><i class="fas fa-user-shield"></i> Admin</a>
             </nav>
         </div>
     </header>
@@ -22,28 +229,19 @@
     <main class="container">
         <h1><i class="fas fa-graduation-cap"></i> Trainingen Overzicht</h1>
         
-        <section class="training-actions">
+        <section class="discord-command">
             <h2><i class="fas fa-plus-circle"></i> Nieuwe Training Plannen</h2>
-            <p>Discord commando: <code>!training &lt;datum&gt; &lt;tijd&gt; &lt;trainer&gt; &lt;onderwerp&gt;</code></p>
+            <p>Discord commando: <code>/training &lt;datum&gt; &lt;tijd&gt; &lt;trainer&gt; &lt;onderwerp&gt;</code></p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> Voorbeeld: <code>/training 10/12/2024 20:00 John Politie Training</code>
+            </p>
         </section>
 
         <section class="upcoming-trainings">
             <h2><i class="fas fa-calendar-alt"></i> Komende Trainingen</h2>
             <div id="trainings-list">
-                <div class="training-card">
-                    <h3><i class="fas fa-user-tie"></i> Politie Basis Training</h3>
-                    <p><i class="far fa-calendar"></i> <strong>Datum:</strong> 10/12/2025</p>
-                    <p><i class="far fa-clock"></i> <strong>Tijd:</strong> 20:00</p>
-                    <p><i class="fas fa-user"></i> <strong>Trainer:</strong> John_Doe</p>
-                    <p><i class="fas fa-book"></i> <strong>Onderwerp:</strong> Basis politiewerk, verkeerscontroles, procedure</p>
-                </div>
-                
-                <div class="training-card">
-                    <h3><i class="fas fa-ambulance"></i> EHBO Gevorderd</h3>
-                    <p><i class="far fa-calendar"></i> <strong>Datum:</strong> 12/12/2025</p>
-                    <p><i class="far fa-clock"></i> <strong>Tijd:</strong> 19:30</p>
-                    <p><i class="fas fa-user"></i> <strong>Trainer:</strong> Medic_Sarah</p>
-                    <p><i class="fas fa-book"></i> <strong>Onderwerp:</strong> Gevorderde EHBO, trauma care, team coordination</p>
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Trainingen laden...
                 </div>
             </div>
         </section>
@@ -51,18 +249,123 @@
         <section class="past-trainings">
             <h2><i class="fas fa-history"></i> Afgelopen Trainingen</h2>
             <div id="past-trainings-list">
-                <p>Laatste trainingen worden hier geladen...</p>
+                <p>Trainingen worden geladen...</p>
             </div>
         </section>
     </main>
 
+    <!-- FOOTER ZELFDE ALS HOME -->
     <footer>
         <div class="container">
-            <p>&copy; 2025 Breda The Netherlands Roleplay. Alle rechten voorbehouden.</p>
+            <p>&copy; 2024 Breda The Netherlands Roleplay. Alle rechten voorbehouden.</p>
             <p>Trainingen worden via Discord bot toegevoegd en automatisch gesynchroniseerd.</p>
         </div>
     </footer>
 
-    <script src="/js/app.js"></script>
+    <script>
+        async function loadTrainings() {
+            try {
+                const response = await fetch('https://bredathenetherlands.netlify.app/.netlify/functions/add-training');
+                const trainingen = await response.json();
+                
+                const upcomingList = document.getElementById('trainings-list');
+                const pastList = document.getElementById('past-trainings-list');
+                
+                if (!trainingen || trainingen.length === 0) {
+                    upcomingList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox fa-2x" style="margin-bottom: 1rem;"></i>
+                            <h3>Geen trainingen</h3>
+                            <p>Er zijn momenteel geen trainingen gepland.</p>
+                        </div>
+                    `;
+                    pastList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-history fa-2x" style="margin-bottom: 1rem;"></i>
+                            <h3>Geen afgelopen trainingen</h3>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Split into upcoming and past
+                const upcoming = [];
+                const past = [];
+                
+                trainingen.forEach(training => {
+                    const [day, month, year] = training.datum.split('/').map(Number);
+                    const trainingDate = new Date(year, month - 1, day);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    if (trainingDate >= today) {
+                        upcoming.push(training);
+                    } else {
+                        past.push(training);
+                    }
+                });
+                
+                // Display upcoming
+                if (upcoming.length > 0) {
+                    let html = '';
+                    upcoming.forEach(training => {
+                        html += `
+                            <div class="training-card">
+                                <h3><i class="fas fa-user-tie"></i> ${training.onderwerp}</h3>
+                                <p><i class="far fa-calendar"></i> <strong>Datum:</strong> ${training.datum}</p>
+                                <p><i class="far fa-clock"></i> <strong>Tijd:</strong> ${training.tijd}</p>
+                                <p><i class="fas fa-user"></i> <strong>Trainer:</strong> ${training.trainer}</p>
+                                ${training.van_discord ? '<p><i class="fab fa-discord"></i> Via Discord</p>' : ''}
+                            </div>
+                        `;
+                    });
+                    upcomingList.innerHTML = html;
+                } else {
+                    upcomingList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-plus fa-2x" style="margin-bottom: 1rem;"></i>
+                            <h3>Geen komende trainingen</h3>
+                        </div>
+                    `;
+                }
+                
+                // Display past
+                if (past.length > 0) {
+                    let html = '';
+                    past.slice(-6).reverse().forEach(training => {
+                        html += `
+                            <div class="training-card" style="opacity: 0.8;">
+                                <h3><i class="fas fa-history"></i> ${training.onderwerp}</h3>
+                                <p><i class="far fa-calendar"></i> <strong>Datum:</strong> ${training.datum}</p>
+                                <p><i class="far fa-clock"></i> <strong>Tijd:</strong> ${training.tijd}</p>
+                                <p><i class="fas fa-user"></i> <strong>Trainer:</strong> ${training.trainer}</p>
+                            </div>
+                        `;
+                    });
+                    pastList.innerHTML = html;
+                } else {
+                    pastList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-history fa-2x" style="margin-bottom: 1rem;"></i>
+                            <h3>Geen afgelopen trainingen</h3>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Fout bij laden:', error);
+                upcomingList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle fa-2x" style="margin-bottom: 1rem;"></i>
+                        <h3>Fout bij laden</h3>
+                        <p>Probeer het later opnieuw.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        setInterval(loadTrainings, 30000);
+        document.addEventListener('DOMContentLoaded', loadTrainings);
+    </script>
 </body>
 </html>
