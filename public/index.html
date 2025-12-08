@@ -8,72 +8,171 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
+    <!-- Header -->
+    <header class="main-header">
         <div class="container">
-            <h1><i class="fas fa-city"></i> Breda The Netherlands Roleplay</h1>
-            <nav>
-                <a href="/" class="active"><i class="fas fa-home"></i> Home</a>
-                <a href="/trainingen.html"><i class="fas fa-graduation-cap"></i> Trainingen</a>
-                <a href="/admin.html"><i class="fas fa-user-shield"></i> Admin</a>
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Breda Roleplay</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/trainingen.html"><i class="fas fa-graduation-cap"></i> Trainingen</a></li>
+                    <li><a href="/admin/"><i class="fas fa-user-shield"></i> Admin</a></li>
+                    <li><a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank" class="github-btn">
+                        <i class="fab fa-github"></i> GitHub
+                    </a></li>
+                </ul>
             </nav>
         </div>
     </header>
 
-    <main class="container">
-        <section class="welcome">
-            <h2><i class="fas fa-door-open"></i> Welkom</h2>
-            <div class="post-card">
-                <div class="post-header">
-                    <span class="post-author"><i class="fas fa-user"></i> Server Management</span>
-                    <span class="post-date"><i class="far fa-calendar"></i> <span id="current-date"></span></span>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1><i class="fas fa-city"></i> Breda The Netherlands Roleplay</h1>
+                <p>Officiële website met trainingen schema en beheerders dashboard</p>
+                <div class="hero-buttons">
+                    <a href="/trainingen.html" class="btn btn-primary">
+                        <i class="fas fa-graduation-cap"></i> Bekijk Trainingen
+                    </a>
+                    <a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank" class="btn btn-secondary">
+                        <i class="fab fa-github"></i> View on GitHub
+                    </a>
                 </div>
-                <p>Welkom op de officiële website van Breda The Netherlands Roleplay!</p>
-                <p>Hier vind je alle informatie over trainingen, regels en updates voor onze server.</p>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="training-overview">
-            <h2><i class="fas fa-clock"></i> Komende Trainingen</h2>
-            <div id="training-list" class="training-list">
-                <p><i class="fas fa-spinner fa-spin"></i> Trainingen worden geladen...</p>
-            </div>
-        </section>
-
-        <section class="server-info">
-            <h2><i class="fas fa-info-circle"></i> Server Informatie</h2>
+    <!-- Info Sections -->
+    <section class="info-sections">
+        <div class="container">
             <div class="info-grid">
                 <div class="info-card">
-                    <i class="fas fa-users"></i>
-                    <h3>Actieve Leden</h3>
-                    <p class="info-value">125+</p>
+                    <div class="info-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Trainingen</h3>
+                    <p>Bekijk alle geplande trainingen en wie ze geeft</p>
+                    <a href="/trainingen.html">Bekijk trainingen →</a>
                 </div>
+                
                 <div class="info-card">
-                    <i class="fas fa-calendar-check"></i>
-                    <h3>Trainingen deze week</h3>
-                    <p class="info-value" id="weekly-trainings">3</p>
+                    <div class="info-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3>Admin Panel</h3>
+                    <p>Beheerders login vereist voor toegang</p>
+                    <a href="/admin/">Naar admin login →</a>
                 </div>
+                
                 <div class="info-card">
-                    <i class="fas fa-shield-alt"></i>
-                    <h3>Online Staff</h3>
-                    <p class="info-value">8</p>
+                    <div class="info-icon">
+                        <i class="fab fa-github"></i>
+                    </div>
+                    <h3>GitHub</h3>
+                    <p>Bekijk de source code en draag bij</p>
+                    <a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank">Bekijk repository →</a>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
-    <footer>
+    <!-- Footer -->
+    <footer class="main-footer">
         <div class="container">
-            <p>&copy; 2025 Breda The Netherlands Roleplay. Alle rechten voorbehouden.</p>
-            <p class="footer-links">
-                <a href="#"><i class="fab fa-discord"></i> Discord</a>
-                |
-                <a href="#"><i class="fas fa-book"></i> Regels</a>
-                |
-                <a href="#"><i class="fas fa-question-circle"></i> Support</a>
-            </p>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Breda Roleplay</h3>
+                    <p>Website gemaakt door Gilles VGB</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/trainingen.html">Trainingen</a></li>
+                        <li><a href="/admin/">Admin Login</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Technologie</h3>
+                    <ul>
+                        <li><a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank">GitHub</a></li>
+                        <li><a href="https://netlify.app" target="_blank">Netlify</a></li>
+                        <li><a href="https://discord.js.org" target="_blank">Discord Bot</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Breda Roleplay. Code op <a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank">GitHub</a>.</p>
+            </div>
         </div>
     </footer>
 
-    <script src="/js/app.js"></script>
+    <style>
+        .github-btn {
+            background: #24292e;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .github-btn:hover {
+            background: #30363d;
+        }
+        
+        .info-sections {
+            padding: 4rem 0;
+            background: #f8f9fa;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .info-icon {
+            font-size: 3rem;
+            color: #1a237e;
+            margin-bottom: 1rem;
+        }
+        
+        .info-card h3 {
+            margin-bottom: 1rem;
+            color: #1a237e;
+        }
+        
+        .info-card a {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #1a237e;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .info-card a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </body>
 </html>
