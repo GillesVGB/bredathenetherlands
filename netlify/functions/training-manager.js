@@ -18,6 +18,34 @@ exports.handler = async (event) => {
 
   // GET - Toon alle trainingen (nu leeg)
   if (event.httpMethod === 'GET') {
+    // CHECK VOOR ROBBLOX ENDPOINT
+    if (event.path.includes('/roblox') || event.queryStringParameters?.roblox === 'true') {
+      // Geef alleen actieve/komende trainingen terug voor Roblox
+      const activeTrainings = trainings.filter(t => 
+        t.status === 'in_progress' || t.status === 'not_started' || t.status === 'upcoming'
+      );
+      
+      // Format voor Roblox
+      const robloxData = activeTrainings.map(t => ({
+        id: t.id,
+        onderwerp: t.onderwerp,  // Zorg dat dit 'onderwerp' is, niet 'title'
+        datum: t.datum,
+        tijd: t.tijd,
+        trainer: t.trainer,
+        status: t.status,
+        status_text: t.status_text,
+        canJoin: t.status === 'in_progress' || t.status === 'not_started',
+        van_discord: t.van_discord || false
+      }));
+      
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(robloxData)
+      };
+    }
+    
+    // Normale GET - alle trainingen
     return {
       statusCode: 200,
       headers,

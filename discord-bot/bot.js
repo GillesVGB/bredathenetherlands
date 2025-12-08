@@ -2,7 +2,7 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, Events, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
-// API URL - GEBRUIK DE JUISTE!
+// API URL
 const TRAINING_API = 'https://bredathenetherlands.netlify.app/.netlify/functions/training-manager';
 
 // KANAAL ID - PAS DIT AAN!
@@ -80,7 +80,13 @@ client.once(Events.ClientReady, async () => {
     
     new SlashCommandBuilder()
       .setName('botinfo')
-      .setDescription('Bot informatie')
+      .setDescription('Bot informatie'),
+    
+    // NIEUW: Start training in Roblox
+    new SlashCommandBuilder()
+      .setName('starttraining')
+      .setDescription('Start training in Roblox')
+      .addIntegerOption(o => o.setName('id').setDescription('Training ID').setRequired(true))
   ].map(c => c.toJSON());
   
   try {
@@ -319,6 +325,66 @@ client.on(Events.InteractionCreate, async interaction => {
     await interaction.reply({ embeds: [embed], ephemeral: true });
   }
   
+  // ========== /starttraining ==========
+  else if (commandName === 'starttraining') {
+    await interaction.deferReply();
+    
+    const trainingId = options.getInteger('id');
+    
+    try {
+      // Update status naar in_progress
+      const response = await axios.put(TRAINING_API, {
+        id: trainingId,
+        status: 'in_progress',
+        status_text: 'Bezig in Roblox'
+      });
+      
+      console.log(`🎮 Training gestart in Roblox: ID ${trainingId}`);
+      
+      const embed = new EmbedBuilder()
+        .setColor(0xf39c12) // Oranje voor "bezig"
+        .setTitle('🎮 TRAINING GESTART IN ROBBLOX!')
+        .setDescription(`Training **#${trainingId}** is nu LIVE!`)
+        .addFields(
+          { name: '🆔 Training ID', value: `#${trainingId}`, inline: true },
+          { name: '🎮 Status', value: '🔄 Bezig in Roblox', inline: true },
+          { name: '👤 Gestart door', value: user.username, inline: true },
+          { name: '🌐 Website', value: 'Training staat nu op website', inline: false },
+          { name: '🎯 Roblox', value: 'Spelers kunnen nu DEELNEMEN!', inline: false }
+        )
+        .setFooter({ 
+          text: `Gestart door ${user.username}`, 
+          iconURL: user.displayAvatarURL({ size: 64 }) 
+        })
+        .setTimestamp();
+      
+      await interaction.editReply({ embeds: [embed] });
+      
+      // Stuur naar training kanaal
+      try {
+        const channel = await guild.channels.fetch(TRAINING_CHANNEL_ID);
+        if (channel?.isTextBased()) {
+          await channel.send({ 
+            content: `@here **🎮 TRAINING GESTART IN ROBBLOX!**\nTraining #${trainingId} is nu actief! Spelers kunnen nu deelnemen via het 📚 menu in Roblox!`
+          });
+        }
+      } catch (e) {
+        console.log('⚠️ Kanaal error:', e.message);
+      }
+      
+    } catch (error) {
+      console.log('❌ Start training error:', error.message);
+      
+      const embed = new EmbedBuilder()
+        .setColor(0xe74c3c)
+        .setTitle('❌ Kon training niet starten')
+        .setDescription(`**API Error:** ${error.response?.data?.error || error.message}`)
+        .setTimestamp();
+      
+      await interaction.editReply({ embeds: [embed] });
+    }
+  }
+  
   // ========== /help ==========
   else if (commandName === 'help') {
     const embed = new EmbedBuilder()
@@ -334,6 +400,11 @@ client.on(Events.InteractionCreate, async interaction => {
         { 
           name: '🔄 `/status`', 
           value: 'Verander status van training\n`id:TrainingID nieuw:NieuweStatus`\n**Status opties:**\n⏳ Niet gestart | 🔄 Bezig | ✅ Afgelopen\n❌ Geannuleerd | 📅 Uitgesteld | 📝 Gepland',
+          inline: false 
+        },
+        { 
+          name: '🎮 `/starttraining`', 
+          value: 'Start training in Roblox\n`id:TrainingID`\n*Dit maakt "DEELNEMEN" knop zichtbaar*',
           inline: false 
         },
         { 
@@ -355,6 +426,11 @@ client.on(Events.InteractionCreate, async interaction => {
           name: '🌐 Website', 
           value: 'https://bredathenetherlands.netlify.app/trainingen/',
           inline: false 
+        },
+        { 
+          name: '🎮 Roblox', 
+          value: 'Klik op 📚 knop rechtsonder om trainingen te zien',
+          inline: false 
         }
       )
       .setFooter({ text: 'Breda The Netherlands Roleplay' })
@@ -370,11 +446,11 @@ client.on(Events.InteractionCreate, async interaction => {
       .setTitle('🤖 Bot Informatie')
       .setDescription('Breda Roleplay Training Bot')
       .addFields(
-        { name: '📊 Versie', value: 'Website Integratie', inline: true },
+        { name: '📊 Versie', value: 'Website + Roblox Integratie', inline: true },
         { name: '🤖 Botnaam', value: client.user.tag, inline: true },
         { name: '💾 Database', value: 'Netlify Functions', inline: true },
         { name: '🔗 Add Training', value: 'Werkt ✅', inline: true },
-        { name: '🔄 Status Update', value: 'Werkt ✅', inline: true },
+        { name: '🎮 Start Roblox', value: 'Werkt ✅', inline: true },
         { name: '🗑️ Delete', value: 'Werkt ✅', inline: true },
         { name: '📢 Kanaal', value: `<#${TRAINING_CHANNEL_ID}>`, inline: false },
         { name: '⚙️ Status Opties', value: '⏳ 🔄 ✅ ❌ 📅 📝', inline: false }
@@ -386,5 +462,5 @@ client.on(Events.InteractionCreate, async interaction => {
   }
 });
 
-console.log('🚀 Starting bot met Website Integratie...');
+console.log('🚀 Starting bot met Website + Roblox Integratie...');
 client.login(process.env.DISCORD_TOKEN);
