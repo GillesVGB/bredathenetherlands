@@ -1,12 +1,26 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="nl" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Breda The Netherlands Roleplay</title>
-    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -14,359 +28,503 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            color: #333;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--light);
             line-height: 1.6;
+            min-height: 100vh;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 1.5rem;
         }
         
-        /* Header */
+        /* Modern Header */
         header {
-            background: linear-gradient(90deg, #1a237e 0%, #283593 100%);
-            color: white;
-            padding: 1.5rem 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         
-        header .container {
+        .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 1.25rem 0;
         }
         
-        header h1 {
-            font-size: 1.8rem;
+        .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
-        nav {
+        .logo i {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links {
             display: flex;
-            gap: 20px;
+            gap: 2rem;
+            list-style: none;
         }
         
-        nav a {
-            color: white;
+        .nav-links a {
+            color: var(--gray-light);
             text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            transition: background 0.3s;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
         }
         
-        nav a:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        
-        nav a.active {
-            background: rgba(255,255,255,0.2);
-            font-weight: 500;
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--light);
+            background: rgba(99, 102, 241, 0.1);
         }
         
         /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            color: white;
-            padding: 4rem 0;
+            padding: 6rem 0;
             text-align: center;
-            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
         }
         
-        .hero h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
         }
         
         .hero p {
-            font-size: 1.2rem;
-            opacity: 0.9;
+            font-size: 1.25rem;
+            color: var(--gray-light);
             max-width: 600px;
-            margin: 0 auto 2rem;
-        }
-        
-        .hero-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        /* Main Content */
-        main {
-            padding: 0 0 2rem 0;
-        }
-        
-        main h1 {
-            color: #1a237e;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        /* Sections */
-        section {
-            margin-bottom: 3rem;
-        }
-        
-        section h2 {
-            color: #1a237e;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #e0e0e0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        /* Discord Command Section */
-        .discord-command {
-            background: #e8f5e9;
-            padding: 2rem;
-            border-radius: 10px;
-            border-left: 4px solid #4caf50;
-        }
-        
-        .discord-command code {
-            background: #1a237e;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
-            display: inline-block;
-            margin: 1rem 0;
-        }
-        
-        .command-example {
-            background: #ffffff;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            border: 1px solid #ddd;
-        }
-        
-        /* Quick Stats */
-        .quick-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            text-align: center;
-            border-top: 4px solid #1a237e;
-        }
-        
-        .stat-card i {
-            font-size: 2.5rem;
-            color: #1a237e;
-            margin-bottom: 1rem;
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #1a237e;
-            margin: 0.5rem 0;
-        }
-        
-        /* Upcoming Trainings */
-        #upcoming-trainings {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .training-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 4px solid #1a237e;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .training-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-        }
-        
-        .training-card h3 {
-            color: #1a237e;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .training-card p {
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .training-card i {
-            color: #666;
-            width: 20px;
+            margin: 0 auto 2.5rem;
         }
         
         /* Buttons */
         .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            font-weight: 500;
-            transition: all 0.3s;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
             border: none;
             cursor: pointer;
             font-size: 1rem;
         }
         
         .btn-primary {
-            background: #1a237e;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
         
         .btn-primary:hover {
-            background: #283593;
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
         }
         
         .btn-secondary {
-            background: #5865F2;
+            background: rgba(255, 255, 255, 0.1);
             color: white;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .btn-secondary:hover {
-            background: #4752c4;
+            background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
         }
         
         .btn-success {
-            background: #4caf50;
+            background: linear-gradient(135deg, var(--success) 0%, #0d9665 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
         
         .btn-success:hover {
-            background: #43a047;
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* Features Grid */
+        .features {
+            padding: 5rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--light);
+        }
+        
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+            color: white;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--light);
+        }
+        
+        .feature-card p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Discord Commands */
+        .discord-commands {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            margin: 3rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .command-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .command-card h4 {
+            color: var(--light);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .command-card code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', monospace;
+            color: var(--primary);
+            display: block;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .command-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Upcoming Trainings */
+        .trainings-preview {
+            padding: 3rem 0;
+        }
+        
+        .trainings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .training-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .training-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+        
+        .training-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--light);
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-not_started { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .status-in_progress { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .status-completed { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .status-cancelled { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .status-delayed { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+        
+        .training-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .detail-item i {
+            color: var(--primary);
         }
         
         /* Footer */
         footer {
-            background: #1a237e;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem 0;
+            margin-top: 5rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+        
+        .footer-section h3 {
+            color: var(--light);
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-section ul li a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-section ul li a:hover {
+            color: var(--primary);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary);
             color: white;
-            padding: 2rem 0;
+            transform: translateY(-3px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
             margin-top: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+            font-size: 0.9rem;
         }
         
-        footer .container {
-            text-align: center;
-        }
-        
-        footer p {
-            margin-bottom: 0.5rem;
-            opacity: 0.8;
-        }
-        
-        /* Loading State */
+        /* Loading Animation */
         .loading {
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             padding: 3rem;
-            color: #666;
-            grid-column: 1 / -1;
         }
         
-        .loading i {
-            margin-right: 10px;
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
         }
         
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #666;
-            background: #f9f9f9;
-            border-radius: 10px;
-            grid-column: 1 / -1;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
-        /* Responsive */
+        /* Responsive Design */
         @media (max-width: 768px) {
-            header .container {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
+            .hero h1 {
+                font-size: 2.5rem;
             }
             
-            nav {
-                flex-wrap: wrap;
-                justify-content: center;
+            .nav-links {
+                display: none;
             }
             
-            .hero h2 {
-                font-size: 2rem;
+            .mobile-menu-btn {
+                display: block;
             }
             
-            .hero p {
-                font-size: 1rem;
-            }
-            
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            #upcoming-trainings {
+            .features-grid,
+            .trainings-grid {
                 grid-template-columns: 1fr;
             }
             
-            .quick-stats {
-                grid-template-columns: 1fr;
+            .discord-commands {
+                padding: 2rem 1rem;
             }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.6s ease-out;
         }
     </style>
 </head>
 <body>
+    <!-- Modern Header -->
     <header>
         <div class="container">
-            <h1><i class="fas fa-city"></i> Breda The Netherlands Roleplay</h1>
-            <nav>
-                <a href="/" class="active"><i class="fas fa-home"></i> Home</a>
-                <a href="/trainingen.html"><i class="fas fa-graduation-cap"></i> Trainingen</a>
-                <a href="/admin/dashboard.html"><i class="fas fa-user-shield"></i> Admin</a>
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Breda Roleplay</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/" class="active"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/trainingen.html"><i class="fas fa-graduation-cap"></i> Trainingen</a></li>
+                    <li><a href="/admin/dashboard.html"><i class="fas fa-user-shield"></i> Admin</a></li>
+                    <li><a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank"><i class="fab fa-github"></i> GitHub</a></li>
+                </ul>
             </nav>
         </div>
     </header>
 
+    <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h2><i class="fas fa-shield-alt"></i> Welkom bij Breda Roleplay</h2>
-            <p>De officiële website voor trainingen, planning en community management</p>
-            <div class="hero-buttons">
+            <h1>Breda The Netherlands Roleplay</h1>
+            <p>Moderne training management met Discord bot integratie. Plan, beheer en volg trainingen in real-time.</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                 <a href="/trainingen.html" class="btn btn-primary">
                     <i class="fas fa-graduation-cap"></i> Bekijk Trainingen
                 </a>
@@ -377,58 +535,91 @@
         </div>
     </section>
 
-    <main class="container">
-        <section class="discord-command">
-            <h2><i class="fab fa-discord"></i> Nieuwe Training Plannen</h2>
-            <p>Gebruik dit Discord commando om een nieuwe training toe te voegen:</p>
-            <code>/training &lt;datum&gt; &lt;tijd&gt; &lt;trainer&gt; &lt;onderwerp&gt;</code>
-            
-            <div class="command-example">
-                <h3><i class="fas fa-lightbulb"></i> Voorbeeld:</h3>
-                <p><code>/training 15/12/2024 20:00 John Politie Basis Training</code></p>
-                <p style="margin-top: 0.5rem; font-size: 0.9rem;">
-                    Dit plant een politie training op 15 december 2024 om 20:00 door John
-                </p>
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Moderne Features</h2>
+                <p>Alles wat je nodig hebt voor efficiënte training management</p>
             </div>
             
-            <div style="margin-top: 1rem;">
-                <button onclick="copyCommand()" class="btn btn-success">
-                    <i class="fas fa-copy"></i> Kopieer Commando
-                </button>
-            </div>
-        </section>
-
-        <section>
-            <h2><i class="fas fa-chart-bar"></i> Snelle Statistieken</h2>
-            <div class="quick-stats">
-                <div class="stat-card">
-                    <i class="fas fa-graduation-cap"></i>
-                    <h3>Totaal Trainingen</h3>
-                    <div class="stat-number" id="total-trainings">0</div>
-                    <p>Geplande trainingen</p>
+            <div class="features-grid">
+                <div class="feature-card animate-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>Discord Bot Commands</h3>
+                    <p>Beheer trainingen direct vanuit Discord met geavanceerde commando's.</p>
+                    <a href="#commands" style="color: var(--primary); text-decoration: none; font-weight: 500;">
+                        Bekijk commands <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
                 
-                <div class="stat-card">
-                    <i class="fas fa-robot"></i>
-                    <h3>Discord Bot</h3>
-                    <div class="stat-number">✅</div>
-                    <p>Actief en online</p>
+                <div class="feature-card animate-in" style="animation-delay: 0.2s">
+                    <div class="feature-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3>Real-time Updates</h3>
+                    <p>Trainingen worden live bijgewerkt op de website zonder pagina refresh.</p>
                 </div>
                 
-                <div class="stat-card">
-                    <i class="fas fa-users"></i>
-                    <h3>Community</h3>
-                    <div class="stat-number">Breda</div>
-                    <p>Roleplay Server</p>
+                <div class="feature-card animate-in" style="animation-delay: 0.4s">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Status Tracking</h3>
+                    <p>Volg training status: Nog niet gestart, Bezig, Afgelopen, en meer.</p>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section>
-            <h2><i class="fas fa-calendar-check"></i> Komende Trainingen</h2>
-            <div id="upcoming-trainings">
+    <!-- Discord Commands Section -->
+    <section class="container">
+        <div class="discord-commands" id="commands">
+            <h2 style="color: var(--light); margin-bottom: 1rem;"><i class="fab fa-discord"></i> Discord Bot Commands</h2>
+            <p style="color: var(--gray); margin-bottom: 2rem;">Beheer trainingen eenvoudig vanuit Discord</p>
+            
+            <div class="command-grid">
+                <div class="command-card">
+                    <h4><i class="fas fa-plus-circle"></i> Training Toevoegen</h4>
+                    <code>/training &lt;datum&gt; &lt;tijd&gt; &lt;trainer&gt; &lt;onderwerp&gt;</code>
+                    <p>Voeg een nieuwe training toe aan het systeem.</p>
+                </div>
+                
+                <div class="command-card">
+                    <h4><i class="fas fa-trash-alt"></i> Training Verwijderen</h4>
+                    <code>/verwijdertraining &lt;id&gt;</code>
+                    <p>Verwijder een bestaande training.</p>
+                </div>
+                
+                <div class="command-card">
+                    <h4><i class="fas fa-exchange-alt"></i> Status Aanpassen</h4>
+                    <code>/veranderstatustraining &lt;id&gt; &lt;status&gt;</code>
+                    <p>Verander de status van een training.</p>
+                </div>
+                
+                <div class="command-card">
+                    <h4><i class="fas fa-list"></i> Trainingen Lijst</h4>
+                    <code>/trainingen</code>
+                    <p>Bekijk alle geplande trainingen.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upcoming Trainings Preview -->
+    <section class="trainings-preview">
+        <div class="container">
+            <div class="section-title">
+                <h2>Komende Trainingen</h2>
+                <p>Binnenkort geplande trainingen</p>
+            </div>
+            
+            <div id="trainings-container" class="trainings-grid">
                 <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i> Trainingen laden...
+                    <div class="spinner"></div>
+                    <p>Trainingen laden...</p>
                 </div>
             </div>
             
@@ -437,82 +628,80 @@
                     <i class="fas fa-list"></i> Bekijk Alle Trainingen
                 </a>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
+    <!-- Footer -->
     <footer>
         <div class="container">
-            <p>&copy; 2024 Breda The Netherlands Roleplay. Alle rechten voorbehouden.</p>
-            <p>Website powered by Netlify, Discord bot en automatische synchronisatie.</p>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Breda Roleplay</h3>
+                    <p>Moderne training management systeem voor de Breda Roleplay community.</p>
+                    <div class="social-links">
+                        <a href="https://discord.gg/breda" target="_blank" title="Discord">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="https://github.com/GillesVGB/bredathenetherlands" target="_blank" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Snelle Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/trainingen.html">Trainingen</a></li>
+                        <li><a href="/admin/dashboard.html">Admin Dashboard</a></li>
+                        <li><a href="/admin/beheer-trainingen.html">Training Beheer</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Discord Commands</h3>
+                    <ul>
+                        <li><code>/training</code> - Nieuwe training</li>
+                        <li><code>/verwijdertraining</code> - Verwijder training</li>
+                        <li><code>/veranderstatustraining</code> - Verander status</li>
+                        <li><code>/trainingen</code> - Lijst trainingen</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Breda The Netherlands Roleplay. Alle rechten voorbehouden.</p>
+                <p>Powered by Netlify & Discord.js</p>
+            </div>
         </div>
     </footer>
 
     <script>
-        // Copy command to clipboard
-        function copyCommand() {
-            const command = '/training <datum> <tijd> <trainer> <onderwerp>';
-            navigator.clipboard.writeText(command)
-                .then(() => {
-                    alert('Commando gekopieerd naar klembord!');
-                })
-                .catch(err => {
-                    console.error('Fout bij kopiëren:', err);
-                });
-        }
-        
-        // Format date for display
-        function formatDate(dateStr) {
-            try {
-                const [day, month, year] = dateStr.split('/').map(Number);
-                const date = new Date(year, month - 1, day);
-                const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-                return date.toLocaleDateString('nl-NL', options);
-            } catch {
-                return dateStr;
-            }
-        }
-        
-        // Check if date is in the future
-        function isFutureDate(dateStr) {
-            try {
-                const [day, month, year] = dateStr.split('/').map(Number);
-                const trainingDate = new Date(year, month - 1, day);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                return trainingDate >= today;
-            } catch {
-                return false;
-            }
-        }
-        
-        // Load trainings for home page
+        // Load and display upcoming trainings
         async function loadTrainings() {
             try {
-                const response = await fetch('https://bredathenetherlands.netlify.app/.netlify/functions/add-training');
+                const response = await fetch('https://bredathenetherlands.netlify.app/.netlify/functions/training-manager');
                 const trainingen = await response.json();
                 
-                const container = document.getElementById('upcoming-trainings');
-                const totalElement = document.getElementById('total-trainings');
+                const container = document.getElementById('trainings-container');
                 
                 if (!trainingen || trainingen.length === 0) {
                     container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-calendar-plus fa-2x" style="margin-bottom: 1rem;"></i>
+                        <div class="training-card" style="grid-column: 1 / -1; text-align: center;">
+                            <div class="feature-icon" style="margin: 0 auto 1rem;">
+                                <i class="fas fa-calendar-plus"></i>
+                            </div>
                             <h3>Geen trainingen gepland</h3>
                             <p>Er zijn momenteel geen trainingen gepland.</p>
-                            <p>Gebruik het Discord commando om een training in te plannen!</p>
+                            <p>Gebruik het Discord commando om een training toe te voegen.</p>
                         </div>
                     `;
-                    totalElement.textContent = '0';
                     return;
                 }
                 
-                // Update total count
-                totalElement.textContent = trainingen.length;
-                
-                // Filter and sort upcoming trainings
+                // Filter upcoming trainings
                 const upcoming = trainingen
-                    .filter(t => isFutureDate(t.datum))
+                    .filter(t => t.status === 'not_started' || t.status === 'delayed')
                     .sort((a, b) => {
                         try {
                             const [dagA, maandA, jaarA] = a.datum.split('/').map(Number);
@@ -524,51 +713,84 @@
                             return 0;
                         }
                     })
-                    .slice(0, 3); // Show only 3 upcoming trainings
+                    .slice(0, 3);
                 
-                // Display upcoming trainings
-                if (upcoming.length > 0) {
-                    let html = '';
-                    upcoming.forEach(training => {
-                        html += `
-                            <div class="training-card">
-                                <h3><i class="fas fa-user-tie"></i> ${training.onderwerp}</h3>
-                                <p><i class="far fa-calendar"></i> <strong>Datum:</strong> ${formatDate(training.datum)}</p>
-                                <p><i class="far fa-clock"></i> <strong>Tijd:</strong> ${training.tijd}</p>
-                                <p><i class="fas fa-user"></i> <strong>Trainer:</strong> ${training.trainer}</p>
-                                ${training.van_discord ? '<p><i class="fab fa-discord"></i> <em>Via Discord gepland</em></p>' : ''}
-                            </div>
-                        `;
-                    });
-                    container.innerHTML = html;
-                } else {
+                if (upcoming.length === 0) {
                     container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-calendar-plus fa-2x" style="margin-bottom: 1rem;"></i>
+                        <div class="training-card" style="grid-column: 1 / -1; text-align: center;">
+                            <div class="feature-icon" style="margin: 0 auto 1rem;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
                             <h3>Geen komende trainingen</h3>
-                            <p>Alle geplande trainingen zijn al geweest.</p>
-                            <p>Plan nieuwe trainingen via Discord!</p>
+                            <p>Alle geplande trainingen zijn voltooid of bezig.</p>
                         </div>
                     `;
+                    return;
                 }
+                
+                // Display upcoming trainings
+                let html = '';
+                upcoming.forEach(training => {
+                    html += `
+                        <div class="training-card animate-in">
+                            <div class="training-header">
+                                <div class="training-title">${training.onderwerp}</div>
+                                <span class="status-badge status-${training.status}">
+                                    ${training.status_text}
+                                </span>
+                            </div>
+                            <div class="training-details">
+                                <div class="detail-item">
+                                    <i class="far fa-calendar"></i>
+                                    <span>${training.datum}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="far fa-clock"></i>
+                                    <span>${training.tijd}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>${training.trainer}</span>
+                                </div>
+                                ${training.van_discord ? `
+                                    <div class="detail-item">
+                                        <i class="fab fa-discord"></i>
+                                        <span>Via Discord</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
                 
             } catch (error) {
                 console.error('Fout bij laden trainingen:', error);
-                document.getElementById('upcoming-trainings').innerHTML = `
-                    <div class="training-card" style="border-left-color: #f44336; grid-column: 1 / -1;">
-                        <h3><i class="fas fa-exclamation-triangle"></i> Fout bij laden</h3>
+                document.getElementById('trainings-container').innerHTML = `
+                    <div class="training-card" style="grid-column: 1 / -1; text-align: center; border-color: var(--danger);">
+                        <div class="feature-icon" style="margin: 0 auto 1rem; background: var(--danger);">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>Fout bij laden</h3>
                         <p>Kon trainingen niet laden. Probeer het later opnieuw.</p>
                     </div>
                 `;
             }
         }
         
-        // Auto-refresh every 30 seconds
-        setInterval(loadTrainings, 30000);
-        
-        // Initial load
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            // Add animation delays
+            document.querySelectorAll('.animate-in').forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // Load trainings
             loadTrainings();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(loadTrainings, 30000);
         });
     </script>
 </body>
