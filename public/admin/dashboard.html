@@ -15,39 +15,53 @@
             background: #f5f7fa;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
+        .admin-header {
             background: linear-gradient(90deg, #1a237e 0%, #283593 100%);
             color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
-        .loading {
-            text-align: center;
-            padding: 4rem;
-            font-size: 1.2rem;
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
         }
         
-        .login-prompt {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 2rem;
-            border-radius: 10px;
-            text-align: center;
+        .admin-nav {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .admin-nav a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
             margin: 2rem auto;
-            max-width: 500px;
+            padding: 0 20px;
         }
         
-        .dashboard-content {
-            display: none;
+        .welcome-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
         }
         
         .stats-grid {
@@ -64,144 +78,141 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             text-align: center;
         }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            color: #1a237e;
+            margin-bottom: 1rem;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 2rem;
+        }
+        
+        .action-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-decoration: none;
+            color: #333;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        .action-card i {
+            font-size: 2rem;
+            color: #1a237e;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="admin-logo">
+            <i class="fas fa-user-shield"></i>
+            <span>Admin Dashboard</span>
+        </div>
+        <nav class="admin-nav">
+            <a href="/admin/index.html"><i class="fas fa-home"></i> Admin Home</a>
+            <a href="/"><i class="fas fa-globe"></i> Website</a>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Uitloggen</a>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
     <div class="container">
-        <div id="loading" class="loading">
-            <i class="fas fa-spinner fa-spin"></i> Bezig met inloggen...
+        <div class="welcome-card">
+            <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+            <p>Welkom in het admin panel van Breda The Netherlands Roleplay.</p>
+            <div id="user-info">
+                <!-- Wordt ingevuld door JavaScript -->
+            </div>
         </div>
         
-        <div id="login-prompt" class="login-prompt" style="display: none;">
-            <h2><i class="fas fa-exclamation-triangle"></i> Niet ingelogd</h2>
-            <p>Je sessie is verlopen of je bent niet ingelogd.</p>
-            <button onclick="openLogin()" style="background: #1a237e; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 1rem;">
-                <i class="fas fa-sign-in-alt"></i> Open Login
-            </button>
-            <p style="margin-top: 1rem; font-size: 0.9rem;">
-                <a href="/admin/simple-login.html" style="color: #1a237e;">Of gebruik simpele login</a>
-            </p>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>Trainingen</h3>
+                <div id="training-count" style="font-size: 2rem; font-weight: bold; color: #1a237e; margin: 0.5rem 0;">0</div>
+                <p>Totaal geplande trainingen</p>
+            </div>
+            
+            <div class="stat-card">
+                <i class="fas fa-robot"></i>
+                <h3>Discord Bot</h3>
+                <p style="color: #4caf50; font-weight: bold;">✅ Online</p>
+                <p>Commands: /training, /trainingen</p>
+            </div>
+            
+            <div class="stat-card">
+                <i class="fas fa-globe"></i>
+                <h3>Website</h3>
+                <p style="color: #4caf50; font-weight: bold;">✅ Live</p>
+                <p>Auto-update trainingen</p>
+            </div>
         </div>
         
-        <div id="dashboard" class="dashboard-content">
-            <div class="header">
-                <h1><i class="fas fa-user-shield"></i> Admin Dashboard</h1>
-                <p>Breda The Netherlands Roleplay - Netlify Identity</p>
-                <div id="user-info">
-                    <!-- Wordt ingevuld door JavaScript -->
-                </div>
-            </div>
+        <h2>Quick Actions</h2>
+        <div class="quick-actions">
+            <a href="/admin/beheer-trainingen.html" class="action-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>Trainingen Beheren</h3>
+                <p>Bekijk en beheer alle trainingen</p>
+            </a>
             
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <i class="fas fa-graduation-cap" style="font-size: 2.5rem; color: #1a237e; margin-bottom: 1rem;"></i>
-                    <h3>Trainingen</h3>
-                    <div id="training-count" style="font-size: 2rem; font-weight: bold; color: #1a237e; margin: 0.5rem 0;">0</div>
-                    <p>Totaal geplande trainingen</p>
-                </div>
-                
-                <div class="stat-card">
-                    <i class="fas fa-robot" style="font-size: 2.5rem; color: #1a237e; margin-bottom: 1rem;"></i>
-                    <h3>Discord Bot</h3>
-                    <p style="color: #4caf50; font-weight: bold;">✅ Online</p>
-                    <p>Commands: /training, /trainingen</p>
-                </div>
-                
-                <div class="stat-card">
-                    <i class="fas fa-globe" style="font-size: 2.5rem; color: #1a237e; margin-bottom: 1rem;"></i>
-                    <h3>Website</h3>
-                    <p style="color: #4caf50; font-weight: bold;">✅ Live</p>
-                    <p>Auto-update trainingen</p>
-                </div>
-            </div>
+            <a href="/trainingen.html" target="_blank" class="action-card">
+                <i class="fas fa-eye"></i>
+                <h3>Bekijk Website</h3>
+                <p>Open publieke trainingen pagina</p>
+            </a>
             
-            <button onclick="logout()" style="background: #d32f2f; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 2rem;">
-                <i class="fas fa-sign-out-alt"></i> Uitloggen
-            </button>
+            <a href="https://app.netlify.com/sites/bredathenetherlands/identity" target="_blank" class="action-card">
+                <i class="fas fa-users"></i>
+                <h3>Gebruikers</h3>
+                <p>Beheer Netlify Identity gebruikers</p>
+            </a>
+            
+            <a href="/admin/simple-login.html" class="action-card">
+                <i class="fas fa-key"></i>
+                <h3>Simpele Login</h3>
+                <p>Alternatieve login methode</p>
+            </a>
         </div>
     </div>
     
     <script>
-        // DOM elementen
-        const loadingEl = document.getElementById('loading');
-        const loginPromptEl = document.getElementById('login-prompt');
-        const dashboardEl = document.getElementById('dashboard');
-        const userInfoEl = document.getElementById('user-info');
-        
-        // Debug logging
-        function debug(msg) {
-            console.log(`[Dashboard] ${msg}`);
-        }
-        
-        // Check login status
+        // Controleer login
         function checkAuth() {
-            debug('Checking authentication...');
-            
             if (!window.netlifyIdentity) {
-                debug('Netlify Identity not loaded');
-                showLoginPrompt('Netlify Identity niet geladen. Refresh de pagina.');
+                alert('Netlify Identity niet geladen. Refresh de pagina.');
                 return;
             }
             
             const user = netlifyIdentity.currentUser();
             
             if (user) {
-                debug(`User found: ${user.email}`);
-                showDashboard(user);
-            } else {
-                debug('No user found');
-                showLoginPrompt('Je bent niet ingelogd. Klik op "Open Login".');
-            }
-        }
-        
-        // Toon dashboard
-        function showDashboard(user) {
-            loadingEl.style.display = 'none';
-            loginPromptEl.style.display = 'none';
-            dashboardEl.style.display = 'block';
-            
-            // Toon gebruiker info
-            userInfoEl.innerHTML = `
-                <p><strong><i class="fas fa-user"></i> ${user.email}</strong></p>
-                <p><small>ID: ${user.id.substring(0, 8)}...</small></p>
-            `;
-            
-            // Laad trainingen
-            loadTrainingen();
-        }
-        
-        // Toon login prompt
-        function showLoginPrompt(message) {
-            loadingEl.style.display = 'none';
-            loginPromptEl.style.display = 'block';
-            dashboardEl.style.display = 'none';
-            
-            if (message) {
-                loginPromptEl.innerHTML = `
-                    <h2><i class="fas fa-exclamation-triangle"></i> ${message}</h2>
-                    <button onclick="openLogin()" style="background: #1a237e; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 1rem;">
-                        <i class="fas fa-sign-in-alt"></i> Open Login
-                    </button>
-                    <p style="margin-top: 1rem; font-size: 0.9rem;">
-                        <a href="/admin/simple-login.html" style="color: #1a237e;">Of gebruik simpele login</a>
-                    </p>
+                // Toon gebruiker info
+                document.getElementById('user-info').innerHTML = `
+                    <p><strong><i class="fas fa-user"></i> ${user.email}</strong></p>
+                    <p><small>Ingelogd sinds: ${new Date().toLocaleTimeString()}</small></p>
                 `;
+                
+                // Laad trainingen
+                loadTrainingen();
+            } else {
+                // Niet ingelogd, redirect naar login
+                window.location.href = '/admin/index.html';
             }
-        }
-        
-        // Open login modal
-        function openLogin() {
-            if (window.netlifyIdentity) {
-                netlifyIdentity.open('login');
-            }
-        }
-        
-        // Logout
-        function logout() {
-            if (window.netlifyIdentity) {
-                netlifyIdentity.logout();
-            }
-            window.location.href = '/admin/login.html';
         }
         
         // Laad trainingen
@@ -215,44 +226,34 @@
             }
         }
         
+        // Logout
+        function logout() {
+            if (window.netlifyIdentity) {
+                netlifyIdentity.logout();
+                setTimeout(() => {
+                    window.location.href = '/admin/index.html';
+                }, 500);
+            }
+        }
+        
         // Event listeners
         if (window.netlifyIdentity) {
             netlifyIdentity.on('init', user => {
-                debug(`Identity initialized. User: ${user ? user.email : 'none'}`);
+                console.log('Dashboard: Identity initialized');
                 checkAuth();
             });
             
-            netlifyIdentity.on('login', user => {
-                debug(`User logged in: ${user.email}`);
-                showDashboard(user);
-            });
-            
             netlifyIdentity.on('logout', () => {
-                debug('User logged out');
-                showLoginPrompt('Je bent uitgelogd.');
+                window.location.href = '/admin/index.html';
             });
             
-            netlifyIdentity.on('error', err => {
-                debug(`Identity error: ${err.message || err}`);
-                showLoginPrompt(`Identity error: ${err.message}`);
-            });
-            
-            // Initialize
-            debug('Initializing Netlify Identity...');
             netlifyIdentity.init();
-            
         } else {
-            debug('Netlify Identity script not loaded');
-            showLoginPrompt('Netlify Identity niet geladen. Refresh de pagina.');
+            checkAuth();
         }
         
-        // Fallback timeout
-        setTimeout(() => {
-            if (loadingEl.style.display !== 'none') {
-                debug('Timeout reached, showing login prompt');
-                showLoginPrompt('Timeout bij inloggen. Probeer opnieuw.');
-            }
-        }, 5000);
+        // Auto-refresh trainingen elke 30 seconden
+        setInterval(loadTrainingen, 30000);
     </script>
 </body>
 </html>

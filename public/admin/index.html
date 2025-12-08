@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Breda Roleplay</title>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .admin-welcome {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .admin-logo {
+            font-size: 4rem;
+            color: #1a237e;
+            margin-bottom: 1rem;
+        }
+        
+        .admin-welcome h1 {
+            color: #1a237e;
+            margin-bottom: 0.5rem;
+        }
+        
+        .admin-welcome p {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .login-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 2rem;
+        }
+        
+        .login-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn-github {
+            background: #24292e;
+            color: white;
+        }
+        
+        .btn-email {
+            background: #1a237e;
+            color: white;
+        }
+        
+        .btn-simple {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .quick-links {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .quick-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #1a237e;
+            text-decoration: none;
+        }
+        
+        .quick-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-online {
+            background: #4caf50;
+        }
+        
+        .loading {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-welcome">
+        <div class="admin-logo">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <h1>Breda Roleplay Admin</h1>
+        <p>Beheer je roleplay server via dit admin panel. Kies een login methode:</p>
+        
+        <div id="loading" class="loading">
+            <p><i class="fas fa-spinner fa-spin"></i> Controleer login status...</p>
+        </div>
+        
+        <div id="login-section" class="login-options">
+            <button onclick="loginWithGitHub()" class="login-btn btn-github">
+                <i class="fab fa-github"></i> Inloggen met GitHub
+            </button>
+            
+            <button onclick="loginWithEmail()" class="login-btn btn-email">
+                <i class="fas fa-envelope"></i> Inloggen met Email
+            </button>
+            
+            <button onclick="loginSimple()" class="login-btn btn-simple">
+                <i class="fas fa-key"></i> Simpele Admin Login
+            </button>
+        </div>
+        
+        <div id="logged-in-section" style="display: none;">
+            <p><i class="fas fa-check-circle" style="color: #4caf50;"></i> Je bent al ingelogd!</p>
+            <button onclick="goToDashboard()" class="login-btn btn-email" style="margin-top: 1rem;">
+                <i class="fas fa-tachometer-alt"></i> Naar Dashboard
+            </button>
+        </div>
+        
+        <div class="quick-links">
+            <p><strong>Website Status:</strong>
+                <span class="status-indicator status-online"></span>Online
+            </p>
+            <p>
+                <a href="/" target="_blank"><i class="fas fa-globe"></i> Publieke Website</a> |
+                <a href="/trainingen.html" target="_blank"><i class="fas fa-graduation-cap"></i> Trainingen</a> |
+                <a href="https://discord.com" target="_blank"><i class="fab fa-discord"></i> Discord</a>
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Font Awesome toevoegen
+        const faScript = document.createElement('script');
+        faScript.src = 'https://kit.fontawesome.com/your-fa-kit.js';
+        faScript.crossOrigin = 'anonymous';
+        document.head.appendChild(faScript);
+        
+        // DOM elementen
+        const loadingEl = document.getElementById('loading');
+        const loginSectionEl = document.getElementById('login-section');
+        const loggedInSectionEl = document.getElementById('logged-in-section');
+        
+        // Debug logging
+        function debug(msg) {
+            console.log(`[Admin Index] ${msg}`);
+        }
+        
+        // Initialisatie
+        function init() {
+            debug('Initializing admin index page...');
+            
+            if (!window.netlifyIdentity) {
+                debug('Netlify Identity script not loaded');
+                showLoginOptions();
+                return;
+            }
+            
+            // Controleer of gebruiker al ingelogd is
+            netlifyIdentity.on('init', user => {
+                debug(`Identity initialized. User: ${user ? 'Logged in' : 'Not logged in'}`);
+                
+                if (user) {
+                    // Al ingelogd
+                    showLoggedIn(user);
+                } else {
+                    // Niet ingelogd
+                    showLoginOptions();
+                }
+            });
+            
+            // Event listeners
+            netlifyIdentity.on('login', user => {
+                debug(`User logged in: ${user.email}`);
+                showLoggedIn(user);
+                setTimeout(() => {
+                    window.location.href = '/admin/dashboard.html';
+                }, 1500);
+            });
+            
+            // Initialize Netlify Identity
+            debug('Initializing Netlify Identity...');
+            netlifyIdentity.init();
+        }
+        
+        // Toon login opties
+        function showLoginOptions() {
+            loadingEl.style.display = 'none';
+            loginSectionEl.style.display = 'flex';
+            loggedInSectionEl.style.display = 'none';
+        }
+        
+        // Toon ingelogde status
+        function showLoggedIn(user) {
+            loadingEl.style.display = 'none';
+            loginSectionEl.style.display = 'none';
+            loggedInSectionEl.style.display = 'block';
+            
+            // Update tekst met gebruiker email
+            loggedInSectionEl.querySelector('p').innerHTML = 
+                `<i class="fas fa-check-circle" style="color: #4caf50;"></i> 
+                Ingeldog als: <strong>${user.email}</strong>`;
+        }
+        
+        // Login functies
+        function loginWithGitHub() {
+            debug('Opening GitHub login...');
+            if (window.netlifyIdentity) {
+                netlifyIdentity.open('login');
+            } else {
+                alert('Netlify Identity niet geladen. Refresh de pagina.');
+            }
+        }
+        
+        function loginWithEmail() {
+            debug('Opening email login...');
+            if (window.netlifyIdentity) {
+                netlifyIdentity.open('login');
+            } else {
+                alert('Netlify Identity niet geladen. Refresh de pagina.');
+            }
+        }
+        
+        function loginSimple() {
+            debug('Redirecting to simple login...');
+            window.location.href = '/admin/simple-login.html';
+        }
+        
+        function goToDashboard() {
+            window.location.href = '/admin/dashboard.html';
+        }
+        
+        // Start initialisatie
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toon loading eerst
+            loadingEl.style.display = 'block';
+            loginSectionEl.style.display = 'none';
+            loggedInSectionEl.style.display = 'none';
+            
+            // Start init na korte delay
+            setTimeout(init, 500);
+        });
+        
+        // Auto-redirect als al ingelogd (na 3 seconden)
+        setTimeout(() => {
+            if (window.netlifyIdentity) {
+                const user = netlifyIdentity.currentUser();
+                if (user) {
+                    debug('Auto-redirecting to dashboard...');
+                    window.location.href = '/admin/dashboard.html';
+                }
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+# Admin redirects
+/admin/* /admin/index.html 200
+
+# Fallback voor oudere links
+/admin /admin/index.html 301
+/dashboard /admin/dashboard.html 301
+/beheer /admin/beheer-trainingen.html 301

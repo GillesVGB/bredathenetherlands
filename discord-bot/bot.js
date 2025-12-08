@@ -4,7 +4,9 @@ const axios = require('axios');
 
 // Netlify Function URLs
 const ADD_TRAINING_URL = 'https://bredathenetherlands.netlify.app/.netlify/functions/add-training';
-const GET_TRAININGS_URL = 'https://bredathenetherlands.netlify.app/.netlify/functions/add-training'; // Zelfde URL voor GET & POST
+
+// SPECIFIEK KANAAL ID VOOR TRAININGEN - VERVANG DIT MET JOUW KANAAL ID!
+const TRAINING_CHANNEL_ID = '1439631013964677222';
 
 const client = new Client({
   intents: [
@@ -19,16 +21,14 @@ client.once(Events.ClientReady, () => {
   console.log(`=========================================`);
   console.log(`✅ Breda Roleplay Bot is online!`);
   console.log(`🤖 Bot: ${client.user.tag}`);
-  console.log(`🆔 ID: ${client.user.id}`);
   console.log(`🔗 Netlify Function: ${ADD_TRAINING_URL}`);
+  console.log(`📢 Training Channel ID: ${TRAINING_CHANNEL_ID}`);
   console.log(`=========================================`);
   
   // Toon server info
   console.log(`🏠 Connected to ${client.guilds.cache.size} server(s):`);
   client.guilds.cache.forEach(guild => {
     console.log(`   • ${guild.name} (${guild.memberCount} members)`);
-    console.log(`     Owner: ${guild.ownerId}`);
-    console.log(`     Channels: ${guild.channels.cache.size}`);
   });
   console.log(`=========================================`);
 });
@@ -80,6 +80,7 @@ client.on(Events.InteractionCreate, async interaction => {
       console.log(`📤 [${new Date().toLocaleTimeString()}] Training verzenden naar Netlify...`);
       console.log(`   Data:`, trainingData);
 
+      // 1. Stuur naar Netlify Function
       const response = await axios.post(ADD_TRAINING_URL, trainingData, {
         headers: { 
           'Content-Type': 'application/json',
@@ -90,7 +91,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
       console.log(`✅ [${new Date().toLocaleTimeString()}] Netlify response:`, response.data);
 
-      // Maak success embed
+      // 2. Stuur embed naar gebruiker
       const successEmbed = new EmbedBuilder()
         .setColor(0x00FF00) // Groen
         .setTitle('✅ Training Toegevoegd!')
@@ -105,50 +106,61 @@ client.on(Events.InteractionCreate, async interaction => {
           text: `Toegevoegd door ${user.username}`, 
           iconURL: user.displayAvatarURL({ size: 64 }) 
         })
-        .setTimestamp()
-        .setThumbnail('https://cdn.discordapp.com/attachments/1063421315962839111/1063422909899542578/training_icon.png');
+        .setTimestamp();
 
       await interaction.editReply({ embeds: [successEmbed] });
 
-      // Stuur naar trainingen kanaal (optioneel)
-      if (guild) {
-        const trainingChannel = guild.channels.cache.find(channel => 
-          channel.isTextBased() &&
-          (channel.name.toLowerCase().includes('training') || 
-           channel.name.toLowerCase().includes('agenda') ||
-           channel.name.toLowerCase().includes('rooster') ||
-           channel.name.toLowerCase().includes('announcements'))
-        );
+      // 3. STUUR NAAR SPECIFIEK KANAAL (1439631013964677222)
+      try {
+        const trainingChannel = await guild.channels.fetch(TRAINING_CHANNEL_ID);
         
-        if (trainingChannel) {
-          try {
-            const announcementEmbed = new EmbedBuilder()
-              .setColor(0x0099FF) // Blauw
-              .setTitle('📚 Nieuwe Training Gepland!')
-              .setDescription('Er is een nieuwe training toegevoegd aan het rooster.')
-              .addFields(
-                { name: 'Onderwerp', value: onderwerp },
-                { name: 'Datum & Tijd', value: `${datum} om ${tijd} uur`, inline: true },
-                { name: 'Trainer', value: trainer, inline: true },
-                { name: 'Toegevoegd door', value: `<@${user.id}>`, inline: true }
-              )
-              .setFooter({ 
-                text: 'Breda The Netherlands Roleplay', 
-                iconURL: guild.iconURL({ size: 64 }) 
-              })
-              .setTimestamp()
-              .setThumbnail(user.displayAvatarURL({ size: 64 }));
-
-            await trainingChannel.send({ 
-              content: `📢 **Nieuwe training!** <@&${guild.roles.cache.find(r => r.name.includes('Training') || r.name.includes('Member'))?.id || ''}>`,
-              embeds: [announcementEmbed] 
-            });
-            
-            console.log(`📢 Announcement sent to #${trainingChannel.name}`);
-          } catch (announcementError) {
-            console.warn('⚠️ Could not send announcement:', announcementError.message);
-          }
+        if (trainingChannel && trainingChannel.isTextBased()) {
+          console.log(`📢 Channel gevonden: #${trainingChannel.name} (${trainingChannel.id})`);
+          
+          const announcementEmbed = new EmbedBuilder()
+            .setColor(0x0099FF) // Blauw
+            .setTitle('📚 NIEUWE TRAINING GEPLAND!')
+            .setDescription('Er is een nieuwe training toegevoegd aan het rooster.')
+            .addFields(
+              { name: '🎓 Onderwerp', value: onderwerp, inline: false },
+              { name: '📅 Datum', value: datum, inline: true },
+              { name: '⏰ Tijd', value: `${tijd} uur`, inline: true },
+              { name: '👨‍🏫 Trainer', value: trainer, inline: true },
+              { name: '👤 Toegevoegd door', value: `<@${user.id}>`, inline: true }
+            )
+            .setFooter({ 
+              text: 'Breda The Netherlands Roleplay', 
+              iconURL: guild.iconURL({ size: 64 }) || client.user.displayAvatarURL({ size: 64 })
+            })
+            .setTimestamp()
+            .setThumbnail(user.displayAvatarURL({ size: 64 }));
+          
+          // Voeg @everyone of @here toe voor notificatie (optioneel)
+          const mention = guild.roles.cache.find(r => r.name === 'Training') ? 
+            `<@&${guild.roles.cache.find(r => r.name === 'Training').id}>` : 
+            '@here';
+          
+          await trainingChannel.send({ 
+            content: `${mention} **NIEUWE TRAINING!** 🎓`,
+            embeds: [announcementEmbed] 
+          });
+          
+          console.log(`✅ Announcement sent to #${trainingChannel.name}`);
+        } else {
+          console.warn(`⚠️ Channel ${TRAINING_CHANNEL_ID} niet gevonden of geen tekstkanaal`);
+          // Stuur naar huidig kanaal als fallback
+          await interaction.channel.send({
+            embeds: [successEmbed],
+            content: `📢 **Nieuwe training toegevoegd door ${user.username}!**`
+          });
         }
+      } catch (channelError) {
+        console.error('❌ Fout bij verzenden naar channel:', channelError.message);
+        // Fallback: stuur naar huidig kanaal
+        await interaction.channel.send({
+          embeds: [successEmbed.setTitle('✅ Training Toegevoegd (geen kanaal gevonden)')],
+          content: `⚠️ Kon niet naar trainingen kanaal sturen, maar training is wel opgeslagen.`
+        });
       }
 
     } catch (error) {
@@ -158,22 +170,15 @@ client.on(Events.InteractionCreate, async interaction => {
       
       if (error.code === 'ECONNREFUSED') {
         errorMessage += '🔌 **Netlify is niet bereikbaar.**\n';
-        errorMessage += 'Controleer je internetverbinding.\n';
       } else if (error.response?.status === 404) {
         errorMessage += '🔍 **Netlify Function niet gevonden (404).**\n';
-        errorMessage += 'De function is nog niet geïmplementeerd op Netlify.\n';
-        errorMessage += 'Ga naar: https://app.netlify.com/sites/bredathenetherlands/functions';
       } else if (error.response?.status === 500) {
         errorMessage += '⚙️ **Server error in Netlify Function.**\n';
-        errorMessage += 'Controleer de Netlify function logs.\n';
       } else if (error.code === 'ETIMEDOUT') {
         errorMessage += '⏱️ **Timeout - Netlify reageert niet.**\n';
-        errorMessage += 'Probeer het later opnieuw.\n';
       } else {
         errorMessage += `💻 **Technische fout:** ${error.message}\n`;
       }
-      
-      errorMessage += '\n⚠️ **Probeer het opnieuw of neem contact op met de server admin.**';
       
       const errorEmbed = new EmbedBuilder()
         .setColor(0xFF0000) // Rood
@@ -183,7 +188,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
       await interaction.editReply({ 
         embeds: [errorEmbed],
-        flags: 64 // Ephemeral
+        flags: 64
       });
     }
   }
@@ -195,11 +200,9 @@ client.on(Events.InteractionCreate, async interaction => {
     try {
       console.log(`📥 [${new Date().toLocaleTimeString()}] Trainingen ophalen van Netlify...`);
       
-      const response = await axios.get(GET_TRAININGS_URL, { 
+      const response = await axios.get(ADD_TRAINING_URL, { 
         timeout: 10000,
-        headers: {
-          'User-Agent': 'BredaRoleplayBot/1.0'
-        }
+        headers: { 'User-Agent': 'BredaRoleplayBot/1.0' }
       });
       
       const trainingen = response.data;
@@ -242,33 +245,26 @@ client.on(Events.InteractionCreate, async interaction => {
           text: 'Breda The Netherlands Roleplay', 
           iconURL: client.user.displayAvatarURL({ size: 64 }) 
         })
-        .setTimestamp()
-        .setThumbnail('https://cdn.discordapp.com/attachments/1063421315962839111/1063422909899542578/calendar_icon.png');
+        .setTimestamp();
       
-      // Voeg trainingen toe (max 10 voor leesbaarheid)
-      const trainingenToShow = gesorteerdeTrainingen.slice(0, 10);
+      // Voeg trainingen toe (max 5 voor leesbaarheid)
+      const trainingenToShow = gesorteerdeTrainingen.slice(0, 5);
       
       trainingenToShow.forEach((training, index) => {
         mainEmbed.addFields({
           name: `#${index + 1} - ${training.onderwerp}`,
-          value: `📅 **Datum:** ${training.datum}\n` +
-                 `⏰ **Tijd:** ${training.tijd}\n` +
-                 `👨‍🏫 **Trainer:** ${training.trainer}\n` +
-                 `👤 **Toegevoegd door:** ${training.toegevoegd_door || 'Onbekend'}`,
+          value: `📅 ${training.datum} | ⏰ ${training.tijd}\n👨‍🏫 ${training.trainer}`,
           inline: false
         });
       });
       
-      // Voeg extra info toe als er meer trainingen zijn
-      if (gesorteerdeTrainingen.length > 10) {
+      // Voeg link naar website toe
+      if (gesorteerdeTrainingen.length > 5) {
         mainEmbed.addFields({
-          name: '📊 Meer trainingen',
-          value: `En nog ${gesorteerdeTrainingen.length - 10} training(en)...\n` +
-                 `Bekijk alle trainingen op de website:`,
+          name: '🌐 Website',
+          value: `Bekijk alle ${gesorteerdeTrainingen.length} trainingen op:\nhttps://bredathenetherlands.netlify.app/trainingen.html`,
           inline: false
         });
-        
-        mainEmbed.setURL('https://bredathenetherlands.netlify.app/trainingen.html');
       }
       
       await interaction.editReply({ embeds: [mainEmbed] });
@@ -279,11 +275,7 @@ client.on(Events.InteractionCreate, async interaction => {
       const errorEmbed = new EmbedBuilder()
         .setColor(0xFF0000) // Rood
         .setTitle('❌ Kon trainingen niet laden')
-        .setDescription('Er is een probleem met de verbinding naar de website.')
-        .addFields(
-          { name: '🔧 Oplossing 1', value: 'Probeer het later opnieuw', inline: true },
-          { name: '🔧 Oplossing 2', value: 'Bekijk trainingen op de website', inline: true }
-        )
+        .setDescription('Probeer het later opnieuw of bekijk de trainingen op de website.')
         .setURL('https://bredathenetherlands.netlify.app/trainingen.html')
         .setTimestamp();
 
@@ -296,92 +288,35 @@ client.on(Events.InteractionCreate, async interaction => {
     const helpEmbed = new EmbedBuilder()
       .setColor(0x7289DA) // Discord blauw
       .setTitle('🤖 Breda Roleplay Bot Help')
-      .setDescription('Alle beschikbare commando\'s voor trainingen beheer:')
+      .setDescription('Alle beschikbare commando\'s:')
       .addFields(
         {
           name: '🎓 `/training`',
           value: 'Plan een nieuwe training\n' +
-                 '```/training datum:15/12/2025 tijd:20:00 trainer:John_Doe onderwerp:Politie_Basis```\n' +
-                 '**Parameters:**\n' +
-                 '• `datum`: dd/mm/yyyy (verplicht)\n' +
-                 '• `tijd`: uu:mm (verplicht)\n' +
-                 '• `trainer`: Naam van trainer (verplicht)\n' +
-                 '• `onderwerp`: Beschrijving (verplicht)'
+                 '```/training datum:dd/mm/yyyy tijd:uu:mm trainer:Naam onderwerp:Onderwerp```'
         },
         {
           name: '📚 `/trainingen`',
-          value: 'Toon alle geplande trainingen\n' +
-                 'Laat alle trainingen zien die zijn toegevoegd via de bot.'
+          value: 'Toon alle geplande trainingen'
         },
         {
-          name: '❓ `/help`',
-          value: 'Toon dit help menu'
+          name: '🌐 Website',
+          value: 'https://bredathenetherlands.netlify.app'
         }
       )
       .setFooter({ 
-        text: 'Breda The Netherlands Roleplay | Bot v1.0', 
-        iconURL: client.user.displayAvatarURL({ size: 64 }) 
-      })
-      .setTimestamp()
-      .setThumbnail('https://cdn.discordapp.com/attachments/1063421315962839111/1063422909899542578/help_icon.png');
-
-    await interaction.reply({ embeds: [helpEmbed] });
-  }
-
-  // ==================== /serverinfo COMMAND ====================
-  if (commandName === 'serverinfo') {
-    if (!guild) {
-      return interaction.reply({
-        content: '❌ Dit commando werkt alleen in een server.',
-        flags: 64
-      });
-    }
-
-    const serverEmbed = new EmbedBuilder()
-      .setColor(guild.roles.highest.color || 0x7289DA)
-      .setTitle(`🏰 ${guild.name}`)
-      .setThumbnail(guild.iconURL({ size: 256, dynamic: true }))
-      .setDescription(guild.description || 'Geen beschrijving beschikbaar')
-      .addFields(
-        { name: '👑 Eigenaar', value: `<@${guild.ownerId}>`, inline: true },
-        { name: '🆔 Server ID', value: guild.id, inline: true },
-        { name: '📅 Aangemaakt', value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:D>`, inline: true },
-        { name: '👥 Leden', value: `${guild.memberCount}`, inline: true },
-        { name: '📁 Channels', value: `${guild.channels.cache.size}`, inline: true },
-        { name: '🎭 Rollen', value: `${guild.roles.cache.size}`, inline: true },
-        { name: '🚀 Boost Level', value: `Level ${guild.premiumTier}`, inline: true },
-        { name: '✨ Boosts', value: `${guild.premiumSubscriptionCount || 0}`, inline: true },
-        { name: '🌐 Regio', value: guild.preferredLocale || 'Onbekend', inline: true }
-      )
-      .setFooter({ 
         text: 'Breda The Netherlands Roleplay', 
-        iconURL: guild.iconURL({ size: 64, dynamic: true }) 
+        iconURL: client.user.displayAvatarURL({ size: 64 }) 
       })
       .setTimestamp();
 
-    if (guild.bannerURL()) {
-      serverEmbed.setImage(guild.bannerURL({ size: 512, dynamic: true }));
-    }
-
-    await interaction.reply({ embeds: [serverEmbed] });
+    await interaction.reply({ embeds: [helpEmbed] });
   }
 });
 
 // Error handling
 client.on(Events.Error, error => {
   console.error(`❌ [${new Date().toLocaleTimeString()}] Discord.js error:`, error.message);
-});
-
-client.on(Events.Warn, info => {
-  console.warn(`⚠️ [${new Date().toLocaleTimeString()}] Discord.js warning:`, info);
-});
-
-// Graceful shutdown
-process.on('SIGINT', () => {
-  console.log(`\n🛑 [${new Date().toLocaleTimeString()}] Bot afsluiten...`);
-  client.destroy();
-  console.log(`✅ [${new Date().toLocaleTimeString()}] Bot succesvol afgesloten.`);
-  process.exit(0);
 });
 
 // Start bot
