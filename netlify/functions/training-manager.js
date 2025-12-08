@@ -1,28 +1,5 @@
 // netlify/functions/training-manager.js
-let trainings = [
-  {
-    id: 1,
-    onderwerp: "Politie Basis Training",
-    datum: "01/12/2024",
-    tijd: "20:00",
-    trainer: "John Doe",
-    status: "not_started",
-    status_text: "Nog niet gestart",
-    toegevoegd_door: "Gilles",
-    van_discord: true
-  },
-  {
-    id: 2,
-    onderwerp: "EHBO Gevorderd",
-    datum: "03/12/2024",
-    tijd: "19:30",
-    trainer: "Jane Smith",
-    status: "upcoming",
-    status_text: "Gepland",
-    toegevoegd_door: "Bot",
-    van_discord: true
-  }
-];
+let trainings = []; // LEEG - geen test data meer!
 
 exports.handler = async (event) => {
   console.log(`[API] ${event.httpMethod} ${event.path}`);
@@ -39,7 +16,7 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  // GET - Toon alle trainingen
+  // GET - Toon alle trainingen (nu leeg)
   if (event.httpMethod === 'GET') {
     return {
       statusCode: 200,
