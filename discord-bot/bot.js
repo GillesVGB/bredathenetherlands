@@ -2,323 +2,416 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, Events, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
-// Netlify Function URLs
-const ADD_TRAINING_URL = 'https://bredathenetherlands.netlify.app/.netlify/functions/add-training';
+// SUPABASE FUNCTIES (moeten bestaan op Netlify)
+const API_BASE = 'https://bredathenetherlands.netlify.app/.netlify/functions';
+const ADD_TRAINING_URL = `${API_BASE}/add-training`;
+const UPDATE_STATUS_URL = `${API_BASE}/update-training`;  // Moet gemaakt worden
+const DELETE_TRAINING_URL = `${API_BASE}/delete-training`; // Moet gemaakt worden
 
-// SPECIFIEK KANAAL ID VOOR TRAININGEN - VERVANG DIT MET JOUW KANAAL ID!
+// KANAAL ID
 const TRAINING_CHANNEL_ID = '1439631013964677222';
 
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
-  ]
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
 });
 
-// Bot is klaar
-client.once(Events.ClientReady, () => {
+// Status mapping - ZELFDE ALS WEBSITE
+const STATUS_MAP = {
+  'not_started': { name: 'Nog niet gestart', color: 0x3498db, emoji: '⏳' },
+  'in_progress': { name: 'Bezig', color: 0xf39c12, emoji: '🔄' },
+  'completed': { name: 'Afgelopen', color: 0x2ecc71, emoji: '✅' },
+  'cancelled': { name: 'Geannuleerd', color: 0xe74c3c, emoji: '❌' },
+  'delayed': { name: 'Uitgesteld', color: 0x9b59b6, emoji: '📅' }
+};
+
+// Helper functies
+function formatDate(dateStr) {
+  try {
+    const [d, m, y] = dateStr.split('/').map(Number);
+    return new Date(y, m-1, d).toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  } catch { return dateStr; }
+}
+
+function isValidDate(dateStr) {
+  return /^\d{2}\/\d{2}\/\d{4}$/.test(dateStr);
+}
+
+function isValidTime(timeStr) {
+  return /^\d{2}:\d{2}$/.test(timeStr);
+}
+
+// Bot startup
+client.once(Events.ClientReady, async () => {
   console.log(`=========================================`);
-  console.log(`✅ Breda Roleplay Bot is online!`);
-  console.log(`🤖 Bot: ${client.user.tag}`);
-  console.log(`🔗 Netlify Function: ${ADD_TRAINING_URL}`);
-  console.log(`📢 Training Channel ID: ${TRAINING_CHANNEL_ID}`);
+  console.log(`✅ Breda Roleplay Bot - SUPABASE + STATUS`);
+  console.log(`🤖 ${client.user.tag}`);
+  console.log(`🔗 Add Training: ${ADD_TRAINING_URL}`);
+  console.log(`⚙️ Status Opties: ⏳ 🔄 ✅ ❌ 📅`);
+  console.log(`📢 Channel: ${TRAINING_CHANNEL_ID}`);
   console.log(`=========================================`);
   
-  // Toon server info
-  console.log(`🏠 Connected to ${client.guilds.cache.size} server(s):`);
-  client.guilds.cache.forEach(guild => {
-    console.log(`   • ${guild.name} (${guild.memberCount} members)`);
-  });
-  console.log(`=========================================`);
+  const commands = [
+    // TRAINING TOEVOEGEN
+    new SlashCommandBuilder()
+      .setName('training')
+      .setDescription('Voeg training toe (Supabase)')
+      .addStringOption(o => o.setName('datum').setDescription('DD/MM/YYYY').setRequired(true))
+      .addStringOption(o => o.setName('tijd').setDescription('HH:MM').setRequired(true))
+      .addStringOption(o => o.setName('trainer').setDescription('Trainer naam').setRequired(true))
+      .addStringOption(o => o.setName('onderwerp').setDescription('Onderwerp').setRequired(true)),
+    
+    // STATUS WIJZIGEN
+    new SlashCommandBuilder()
+      .setName('status')
+      .setDescription('Verander status van training')
+      .addIntegerOption(o => o.setName('id').setDescription('Training ID').setRequired(true))
+      .addStringOption(o => o.setName('nieuw')
+        .setDescription('Nieuwe status')
+        .setRequired(true)
+        .addChoices(
+          { name: '⏳ Niet gestart', value: 'not_started' },
+          { name: '🔄 Bezig', value: 'in_progress' },
+          { name: '✅ Afgelopen', value: 'completed' },
+          { name: '❌ Geannuleerd', value: 'cancelled' },
+          { name: '📅 Uitgesteld', value: 'delayed' }
+        )),
+    
+    // TRAININGEN BEKIJKEN
+    new SlashCommandBuilder()
+      .setName('trainingen')
+      .setDescription('Bekijk trainingen op website'),
+    
+    // TRAINING VERWIJDEREN
+    new SlashCommandBuilder()
+      .setName('verwijder')
+      .setDescription('Verwijder training')
+      .addIntegerOption(o => o.setName('id').setDescription('Training ID').setRequired(true)),
+    
+    // HELP
+    new SlashCommandBuilder()
+      .setName('help')
+      .setDescription('Toon help menu'),
+    
+    // BOT INFO
+    new SlashCommandBuilder()
+      .setName('botinfo')
+      .setDescription('Bot informatie')
+  ].map(c => c.toJSON());
+  
+  try {
+    const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
+    await rest.put(Routes.applicationCommands(client.user.id), { body: commands });
+    console.log(`✅ ${commands.length} commands geregistreerd`);
+  } catch (e) {
+    console.error('❌ Commands error:', e);
+  }
 });
 
-// Slash command handler
+// Command handler
 client.on(Events.InteractionCreate, async interaction => {
   if (!interaction.isCommand()) return;
-
+  
   const { commandName, options, user, guild } = interaction;
-
-  // ==================== /training COMMAND ====================
+  
+  // ========== /training ==========
   if (commandName === 'training') {
     await interaction.deferReply();
-
+    
     const datum = options.getString('datum');
     const tijd = options.getString('tijd');
     const trainer = options.getString('trainer');
     const onderwerp = options.getString('onderwerp');
-
-    // Valideer datum formaat (dd/mm/yyyy)
-    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(datum)) {
-      return interaction.editReply({
-        content: '❌ **Ongeldige datum!** Gebruik formaat: dd/mm/yyyy\nBijvoorbeeld: 15/12/2025',
-        flags: 64
+    
+    if (!isValidDate(datum) || !isValidTime(tijd)) {
+      return interaction.editReply({ 
+        content: '❌ **Ongeldige datum/tijd!**\nDatum: DD/MM/YYYY\nTijd: HH:MM\nVoorbeeld: `/training datum:20/12/2025 tijd:19:00 trainer:John onderwerp:Politie Training`',
+        ephemeral: true 
       });
     }
-
-    // Valideer tijd formaat (uu:mm)
-    if (!/^\d{2}:\d{2}$/.test(tijd)) {
-      return interaction.editReply({
-        content: '❌ **Ongeldige tijd!** Gebruik formaat: uu:mm (24-uurs)\nBijvoorbeeld: 20:00',
-        flags: 64
-      });
-    }
-
+    
     const trainingData = {
       datum: datum,
       tijd: tijd,
       trainer: trainer,
       onderwerp: onderwerp,
+      status: 'not_started', // STANDARD STATUS
       toegevoegd_door: user.username,
       discord_user_id: user.id,
-      discord_guild: guild ? guild.name : 'Direct Message',
-      discord_guild_id: guild ? guild.id : 'N/A',
+      van_discord: true,
       timestamp: new Date().toISOString()
     };
-
+    
+    console.log(`📤 Training naar Supabase:`, trainingData);
+    
     try {
-      console.log(`📤 [${new Date().toLocaleTimeString()}] Training verzenden naar Netlify...`);
-      console.log(`   Data:`, trainingData);
-
-      // 1. Stuur naar Netlify Function
+      // STUUR NAAR SUPABASE
       const response = await axios.post(ADD_TRAINING_URL, trainingData, {
-        headers: { 
-          'Content-Type': 'application/json',
-          'User-Agent': 'BredaRoleplayBot/1.0'
-        },
-        timeout: 15000
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 10000
       });
-
-      console.log(`✅ [${new Date().toLocaleTimeString()}] Netlify response:`, response.data);
-
-      // 2. Stuur embed naar gebruiker
-      const successEmbed = new EmbedBuilder()
-        .setColor(0x00FF00) // Groen
-        .setTitle('✅ Training Toegevoegd!')
-        .setDescription('De training is succesvol toegevoegd aan het rooster en de website.')
+      
+      console.log(`✅ Supabase response:`, response.data);
+      
+      const statusInfo = STATUS_MAP.not_started;
+      
+      const embed = new EmbedBuilder()
+        .setColor(statusInfo.color)
+        .setTitle(`${statusInfo.emoji} Training Toegevoegd!`)
+        .setDescription('**Training staat op website met status: ' + statusInfo.name + '**')
         .addFields(
-          { name: '📅 Datum', value: datum, inline: true },
-          { name: '⏰ Tijd', value: tijd, inline: true },
+          { name: '📝 Onderwerp', value: onderwerp, inline: false },
+          { name: '📅 Datum', value: formatDate(datum), inline: true },
+          { name: '⏰ Tijd', value: `${tijd} uur`, inline: true },
           { name: '👨‍🏫 Trainer', value: trainer, inline: true },
-          { name: '📖 Onderwerp', value: onderwerp }
+          { name: '📊 Status', value: `${statusInfo.emoji} ${statusInfo.name}`, inline: true },
+          { name: '💾 Database', value: 'Supabase ✅', inline: true }
         )
         .setFooter({ 
           text: `Toegevoegd door ${user.username}`, 
           iconURL: user.displayAvatarURL({ size: 64 }) 
         })
         .setTimestamp();
-
-      await interaction.editReply({ embeds: [successEmbed] });
-
-      // 3. STUUR NAAR SPECIFIEK KANAAL (1439631013964677222)
+      
+      await interaction.editReply({ embeds: [embed] });
+      
+      // Stuur naar training kanaal
       try {
-        const trainingChannel = await guild.channels.fetch(TRAINING_CHANNEL_ID);
-        
-        if (trainingChannel && trainingChannel.isTextBased()) {
-          console.log(`📢 Channel gevonden: #${trainingChannel.name} (${trainingChannel.id})`);
-          
-          const announcementEmbed = new EmbedBuilder()
-            .setColor(0x0099FF) // Blauw
-            .setTitle('📚 NIEUWE TRAINING GEPLAND!')
-            .setDescription('Er is een nieuwe training toegevoegd aan het rooster.')
+        const channel = await guild.channels.fetch(TRAINING_CHANNEL_ID);
+        if (channel?.isTextBased()) {
+          const announceEmbed = new EmbedBuilder()
+            .setColor(statusInfo.color)
+            .setTitle(`${statusInfo.emoji} NIEUWE TRAINING!`)
+            .setDescription(`Toegevoegd door <@${user.id}>`)
             .addFields(
               { name: '🎓 Onderwerp', value: onderwerp, inline: false },
-              { name: '📅 Datum', value: datum, inline: true },
+              { name: '📅 Datum', value: formatDate(datum), inline: true },
               { name: '⏰ Tijd', value: `${tijd} uur`, inline: true },
               { name: '👨‍🏫 Trainer', value: trainer, inline: true },
-              { name: '👤 Toegevoegd door', value: `<@${user.id}>`, inline: true }
+              { name: '📊 Status', value: statusInfo.name, inline: true }
             )
-            .setFooter({ 
-              text: 'Breda The Netherlands Roleplay', 
-              iconURL: guild.iconURL({ size: 64 }) || client.user.displayAvatarURL({ size: 64 })
-            })
-            .setTimestamp()
-            .setThumbnail(user.displayAvatarURL({ size: 64 }));
+            .setFooter({ text: 'Breda The Netherlands Roleplay' })
+            .setTimestamp();
           
-          // Voeg @everyone of @here toe voor notificatie (optioneel)
-          const mention = guild.roles.cache.find(r => r.name === 'Training') ? 
-            `<@&${guild.roles.cache.find(r => r.name === 'Training').id}>` : 
-            '@here';
-          
-          await trainingChannel.send({ 
-            content: `${mention} **NIEUWE TRAINING!** 🎓`,
-            embeds: [announcementEmbed] 
-          });
-          
-          console.log(`✅ Announcement sent to #${trainingChannel.name}`);
-        } else {
-          console.warn(`⚠️ Channel ${TRAINING_CHANNEL_ID} niet gevonden of geen tekstkanaal`);
-          // Stuur naar huidig kanaal als fallback
-          await interaction.channel.send({
-            embeds: [successEmbed],
-            content: `📢 **Nieuwe training toegevoegd door ${user.username}!**`
+          await channel.send({ 
+            content: `@here **NIEUWE TRAINING!** ${statusInfo.emoji}`,
+            embeds: [announceEmbed] 
           });
         }
-      } catch (channelError) {
-        console.error('❌ Fout bij verzenden naar channel:', channelError.message);
-        // Fallback: stuur naar huidig kanaal
-        await interaction.channel.send({
-          embeds: [successEmbed.setTitle('✅ Training Toegevoegd (geen kanaal gevonden)')],
-          content: `⚠️ Kon niet naar trainingen kanaal sturen, maar training is wel opgeslagen.`
-        });
+      } catch (e) {
+        console.log('⚠️ Kanaal error:', e.message);
       }
-
+      
     } catch (error) {
-      console.error(`❌ [${new Date().toLocaleTimeString()}] Training error:`, error.message);
+      console.error('❌ Supabase error:', error.message);
       
-      let errorMessage = '❌ **Er ging iets mis bij het toevoegen van de training.**\n\n';
-      
-      if (error.code === 'ECONNREFUSED') {
-        errorMessage += '🔌 **Netlify is niet bereikbaar.**\n';
-      } else if (error.response?.status === 404) {
-        errorMessage += '🔍 **Netlify Function niet gevonden (404).**\n';
-      } else if (error.response?.status === 500) {
-        errorMessage += '⚙️ **Server error in Netlify Function.**\n';
-      } else if (error.code === 'ETIMEDOUT') {
-        errorMessage += '⏱️ **Timeout - Netlify reageert niet.**\n';
-      } else {
-        errorMessage += `💻 **Technische fout:** ${error.message}\n`;
-      }
-      
-      const errorEmbed = new EmbedBuilder()
-        .setColor(0xFF0000) // Rood
-        .setTitle('❌ Fout opgetreden')
-        .setDescription(errorMessage)
+      const embed = new EmbedBuilder()
+        .setColor(0xe74c3c)
+        .setTitle('❌ Kon training niet toevoegen')
+        .setDescription(`**API Error:** ${error.response?.status || error.code}`)
+        .addFields(
+          { name: '🔄 Probeer dit:', value: '1. Ga naar de website\n2. Voeg handmatig toe\n3. Check of API online is', inline: false },
+          { name: '🌐 Website', value: 'https://bredathenetherlands.netlify.app/trainingen.html', inline: false }
+        )
         .setTimestamp();
-
-      await interaction.editReply({ 
-        embeds: [errorEmbed],
-        flags: 64
-      });
+      
+      await interaction.editReply({ embeds: [embed] });
     }
   }
-
-  // ==================== /trainingen COMMAND ====================
-  if (commandName === 'trainingen') {
+  
+  // ========== /status ==========
+  else if (commandName === 'status') {
     await interaction.deferReply();
-
+    
+    const trainingId = options.getInteger('id');
+    const newStatus = options.getString('nieuw');
+    const statusInfo = STATUS_MAP[newStatus];
+    
+    const updateData = {
+      id: trainingId,
+      status: newStatus,
+      updated_by: user.username,
+      updated_at: new Date().toISOString()
+    };
+    
+    console.log(`🔄 Status update:`, updateData);
+    
+    // PROBEER UPDATE FUNCTIE
     try {
-      console.log(`📥 [${new Date().toLocaleTimeString()}] Trainingen ophalen van Netlify...`);
-      
-      const response = await axios.get(ADD_TRAINING_URL, { 
-        timeout: 10000,
-        headers: { 'User-Agent': 'BredaRoleplayBot/1.0' }
+      const response = await axios.put(UPDATE_STATUS_URL, updateData, {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 10000
       });
       
-      const trainingen = response.data;
-      
-      if (!trainingen || !Array.isArray(trainingen) || trainingen.length === 0) {
-        const noTrainingsEmbed = new EmbedBuilder()
-          .setColor(0xFFA500) // Oranje
-          .setTitle('📭 Geen Trainingen')
-          .setDescription('Er zijn momenteel geen trainingen gepland.')
-          .addFields({
-            name: '📋 Tip',
-            value: 'Plan een nieuwe training met `/training`'
-          })
-          .setTimestamp();
-
-        return interaction.editReply({ embeds: [noTrainingsEmbed] });
-      }
-      
-      console.log(`✅ [${new Date().toLocaleTimeString()}] ${trainingen.length} training(en) gevonden`);
-      
-      // Sorteer op datum (oudste eerst)
-      const gesorteerdeTrainingen = trainingen.sort((a, b) => {
-        try {
-          const [dagA, maandA, jaarA] = a.datum.split('/').map(Number);
-          const [dagB, maandB, jaarB] = b.datum.split('/').map(Number);
-          const dateA = new Date(jaarA, maandA - 1, dagA);
-          const dateB = new Date(jaarB, maandB - 1, dagB);
-          return dateA - dateB;
-        } catch {
-          return 0;
-        }
-      });
-      
-      // Maak hoofd embed
-      const mainEmbed = new EmbedBuilder()
-        .setColor(0x0099FF) // Blauw
-        .setTitle('📚 Geplande Trainingen')
-        .setDescription(`Er staan **${gesorteerdeTrainingen.length}** training(en) gepland.`)
+      const embed = new EmbedBuilder()
+        .setColor(statusInfo.color)
+        .setTitle(`${statusInfo.emoji} Status Bijgewerkt!`)
+        .setDescription(`Training **#${trainingId}** is bijgewerkt naar **${statusInfo.name}**.`)
+        .addFields(
+          { name: '🆔 Training ID', value: `#${trainingId}`, inline: true },
+          { name: '🔄 Nieuwe Status', value: `${statusInfo.emoji} ${statusInfo.name}`, inline: true },
+          { name: '👤 Bijgewerkt door', value: user.username, inline: true },
+          { name: '🌐 Website', value: 'Status staat nu op de website!', inline: false }
+        )
         .setFooter({ 
-          text: 'Breda The Netherlands Roleplay', 
-          iconURL: client.user.displayAvatarURL({ size: 64 }) 
+          text: `Bijgewerkt door ${user.username}`, 
+          iconURL: user.displayAvatarURL({ size: 64 }) 
         })
         .setTimestamp();
       
-      // Voeg trainingen toe (max 5 voor leesbaarheid)
-      const trainingenToShow = gesorteerdeTrainingen.slice(0, 5);
+      await interaction.editReply({ embeds: [embed] });
       
-      trainingenToShow.forEach((training, index) => {
-        mainEmbed.addFields({
-          name: `#${index + 1} - ${training.onderwerp}`,
-          value: `📅 ${training.datum} | ⏰ ${training.tijd}\n👨‍🏫 ${training.trainer}`,
-          inline: false
-        });
-      });
-      
-      // Voeg link naar website toe
-      if (gesorteerdeTrainingen.length > 5) {
-        mainEmbed.addFields({
-          name: '🌐 Website',
-          value: `Bekijk alle ${gesorteerdeTrainingen.length} trainingen op:\nhttps://bredathenetherlands.netlify.app/trainingen.html`,
-          inline: false
-        });
-      }
-      
-      await interaction.editReply({ embeds: [mainEmbed] });
-
     } catch (error) {
-      console.error(`❌ [${new Date().toLocaleTimeString()}] Fout bij ophalen trainingen:`, error.message);
+      console.log('❌ Status update error:', error.message);
       
-      const errorEmbed = new EmbedBuilder()
-        .setColor(0xFF0000) // Rood
-        .setTitle('❌ Kon trainingen niet laden')
-        .setDescription('Probeer het later opnieuw of bekijk de trainingen op de website.')
-        .setURL('https://bredathenetherlands.netlify.app/trainingen.html')
+      // FALLBACK: Laat zien wat er gebeurd zou zijn
+      const embed = new EmbedBuilder()
+        .setColor(statusInfo.color)
+        .setTitle(`${statusInfo.emoji} Status Update (Handmatig nodig)`)
+        .setDescription(`**UPDATE FUNCTIE BESTAAT NOG NIET**\n\nJe moet handmatig de status aanpassen op de website.`)
+        .addFields(
+          { name: '🆔 Training ID', value: `#${trainingId}`, inline: true },
+          { name: '🔄 Gewenste Status', value: `${statusInfo.emoji} ${statusInfo.name}`, inline: true },
+          { name: '👤 Aangepast door', value: user.username, inline: true },
+          { name: '🌐 Handmatig aanpassen', value: 'Ga naar de website en verander de status daar.', inline: false }
+        )
+        .setFooter({ text: 'Update functie moet nog gemaakt worden op Netlify' })
         .setTimestamp();
-
-      await interaction.editReply({ embeds: [errorEmbed] });
+      
+      await interaction.editReply({ embeds: [embed] });
     }
   }
-
-  // ==================== /help COMMAND ====================
-  if (commandName === 'help') {
-    const helpEmbed = new EmbedBuilder()
-      .setColor(0x7289DA) // Discord blauw
-      .setTitle('🤖 Breda Roleplay Bot Help')
-      .setDescription('Alle beschikbare commando\'s:')
+  
+  // ========== /trainingen ==========
+  else if (commandName === 'trainingen') {
+    await interaction.deferReply();
+    
+    const embed = new EmbedBuilder()
+      .setColor(0x3498db)
+      .setTitle('📚 Trainingen Bekijken')
+      .setDescription('**Bekijk alle trainingen op de website:**')
       .addFields(
-        {
-          name: '🎓 `/training`',
-          value: 'Plan een nieuwe training\n' +
-                 '```/training datum:dd/mm/yyyy tijd:uu:mm trainer:Naam onderwerp:Onderwerp```'
+        { name: '🌐 Website Link', value: 'https://bredathenetherlands.netlify.app/trainingen.html', inline: false },
+        { name: '📊 Status Legenda', value: '⏳ Niet gestart | 🔄 Bezig | ✅ Afgelopen | ❌ Geannuleerd | 📅 Uitgesteld', inline: false },
+        { name: '💡 Tip', value: 'Gebruik `/training` om een training toe te voegen', inline: false }
+      )
+      .setFooter({ text: 'Breda The Netherlands Roleplay' })
+      .setTimestamp();
+    
+    await interaction.editReply({ embeds: [embed] });
+  }
+  
+  // ========== /verwijder ==========
+  else if (commandName === 'verwijder') {
+    await interaction.deferReply({ ephemeral: true });
+    
+    const trainingId = options.getInteger('id');
+    
+    try {
+      const response = await axios.delete(DELETE_TRAINING_URL, {
+        data: { id: trainingId },
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 10000
+      });
+      
+      const embed = new EmbedBuilder()
+        .setColor(0x2ecc71)
+        .setTitle('✅ Training Verwijderd')
+        .setDescription(`Training **#${trainingId}** is verwijderd uit de database.`)
+        .addFields(
+          { name: '🆔 Training ID', value: `#${trainingId}`, inline: true },
+          { name: '👤 Verwijderd door', value: user.username, inline: true },
+          { name: '🌐 Website', value: 'Training is nu van de website verwijderd', inline: false }
+        )
+        .setFooter({ text: `Verwijderd door ${user.username}` })
+        .setTimestamp();
+      
+      await interaction.editReply({ embeds: [embed] });
+      
+    } catch (error) {
+      console.log('❌ Delete error:', error.message);
+      
+      const embed = new EmbedBuilder()
+        .setColor(0xe74c3c)
+        .setTitle('❌ Kon training niet verwijderen')
+        .setDescription(`**DELETE FUNCTIE BESTAAT NOG NIET**\n\nJe moet handmatig verwijderen op de website.`)
+        .addFields(
+          { name: '🆔 Training ID', value: `#${trainingId}`, inline: true },
+          { name: '👤 Wil verwijderen', value: user.username, inline: true },
+          { name: '🌐 Handmatig verwijderen', value: 'Ga naar de website en verwijder de training daar.', inline: false }
+        )
+        .setFooter({ text: 'Delete functie moet nog gemaakt worden op Netlify' })
+        .setTimestamp();
+      
+      await interaction.editReply({ embeds: [embed] });
+    }
+  }
+  
+  // ========== /help ==========
+  else if (commandName === 'help') {
+    const embed = new EmbedBuilder()
+      .setColor(0x7289DA)
+      .setTitle('🤖 Breda Roleplay Bot - Help')
+      .setDescription('**Training Management met Supabase Database**')
+      .addFields(
+        { 
+          name: '🎓 `/training`', 
+          value: 'Voeg training toe\n`datum:DD/MM/YYYY tijd:HH:MM trainer:Naam onderwerp:Onderwerp`\n*Komt direct op website!*',
+          inline: false 
         },
-        {
-          name: '📚 `/trainingen`',
-          value: 'Toon alle geplande trainingen'
+        { 
+          name: '🔄 `/status`', 
+          value: 'Verander status van training\n`id:TrainingID nieuw:NieuweStatus`\n**Status opties:**\n⏳ Niet gestart\n🔄 Bezig\n✅ Afgelopen\n❌ Geannuleerd\n📅 Uitgesteld',
+          inline: false 
         },
-        {
-          name: '🌐 Website',
-          value: 'https://bredathenetherlands.netlify.app'
+        { 
+          name: '🗑️ `/verwijder`', 
+          value: 'Verwijder training\n`id:TrainingID`',
+          inline: false 
+        },
+        { 
+          name: '📚 `/trainingen`', 
+          value: 'Bekijk trainingen op website',
+          inline: false 
+        },
+        { 
+          name: '🤖 `/botinfo`', 
+          value: 'Bot informatie',
+          inline: false 
+        },
+        { 
+          name: '🌐 Website', 
+          value: 'https://bredathenetherlands.netlify.app/trainingen.html',
+          inline: false 
         }
       )
-      .setFooter({ 
-        text: 'Breda The Netherlands Roleplay', 
-        iconURL: client.user.displayAvatarURL({ size: 64 }) 
-      })
+      .setFooter({ text: 'Breda The Netherlands Roleplay' })
       .setTimestamp();
-
-    await interaction.reply({ embeds: [helpEmbed] });
+    
+    await interaction.reply({ embeds: [embed], ephemeral: true });
+  }
+  
+  // ========== /botinfo ==========
+  else if (commandName === 'botinfo') {
+    const embed = new EmbedBuilder()
+      .setColor(0x3498db)
+      .setTitle('🤖 Bot Informatie')
+      .setDescription('Breda Roleplay Training Bot')
+      .addFields(
+        { name: '📊 Versie', value: 'Supabase + Status', inline: true },
+        { name: '🤖 Botnaam', value: client.user.tag, inline: true },
+        { name: '💾 Database', value: 'Supabase', inline: true },
+        { name: '🔗 Add Training', value: 'Werkt ✅', inline: true },
+        { name: '🔄 Status Update', value: 'Functie nodig ⚠️', inline: true },
+        { name: '🗑️ Delete', value: 'Functie nodig ⚠️', inline: true },
+        { name: '📢 Kanaal', value: `<#${TRAINING_CHANNEL_ID}>`, inline: false },
+        { name: '⚙️ Status Opties', value: '⏳ 🔄 ✅ ❌ 📅', inline: false }
+      )
+      .setFooter({ text: 'Breda The Netherlands Roleplay' })
+      .setTimestamp();
+    
+    await interaction.reply({ embeds: [embed], ephemeral: true });
   }
 });
 
-// Error handling
-client.on(Events.Error, error => {
-  console.error(`❌ [${new Date().toLocaleTimeString()}] Discord.js error:`, error.message);
-});
-
-// Start bot
-console.log(`🚀 [${new Date().toLocaleTimeString()}] Bot opstarten...`);
+console.log('🚀 Starting bot met Supabase + Status support...');
 client.login(process.env.DISCORD_TOKEN);
