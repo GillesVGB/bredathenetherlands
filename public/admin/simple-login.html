@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Breda Roleplay</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .login-box {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            margin: 1rem 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .error {
+            color: #f44336;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1><i class="fas fa-user-shield"></i> Admin Login</h1>
+        <p>Voer het admin wachtwoord in:</p>
+        
+        <input type="password" id="password" class="password-input" placeholder="Admin wachtwoord">
+        <button onclick="checkPassword()" class="login-btn">
+            <i class="fas fa-sign-in-alt"></i> Inloggen
+        </button>
+        
+        <div id="error" class="error">
+            <i class="fas fa-exclamation-circle"></i> Verkeerd wachtwoord
+        </div>
+        
+        <div style="margin-top: 2rem; font-size: 0.9rem; color: #666;">
+            <p><strong>Netlify Identity probleem?</strong></p>
+            <p>We gebruiken tijdelijke login tot Identity gefixed is.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Admin wachtwoord (verander dit!)
+        const ADMIN_PASSWORD = 'breda-admin-2025';
+        
+        function checkPassword() {
+            const input = document.getElementById('password').value;
+            const error = document.getElementById('error');
+            
+            if (input === ADMIN_PASSWORD) {
+                // Sla login status op in sessionStorage
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                sessionStorage.setItem('loginTime', new Date().toISOString());
+                
+                // Redirect naar dashboard
+                window.location.href = '/admin/simple-dashboard.html';
+            } else {
+                error.style.display = 'block';
+            }
+        }
+        
+        // Enter toets support
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+    </script>
+</body>
+</html>
