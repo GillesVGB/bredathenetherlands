@@ -9,28 +9,6 @@
 [functions]
   directory = "netlify/functions"
 
-# Redirects voor admin
-[[redirects]]
-  from = "/admin"
-  to = "/admin/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/admin/*"
-  to = "/admin/index.html"
-  status = 200
-
-# Expliciete redirects voor specifieke admin pagina's
-[[redirects]]
-  from = "/admin/dashboard.html"
-  to = "/admin/dashboard.html"
-  status = 200
-
-[[redirects]]
-  from = "/admin/beheer-trainingen.html"
-  to = "/admin/beheer-trainingen.html"
-  status = 200
-
 # Security headers
 [[headers]]
   for = "/admin/*"
