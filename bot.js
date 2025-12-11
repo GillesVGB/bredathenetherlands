@@ -27,8 +27,8 @@ const DIENST_MAP = {
   'Ambulance': { color: 0xFF4444, emoji: '🚑' },
   'Politie': { color: 0x4287f5, emoji: '👮' },
   'Brandweer': { color: 0xFFA500, emoji: '🚒' },
-  'KMar': { color: 0x4B0082, emoji: '🎖️' },
-  'DSI': { color: 0x000000, emoji: '🛡️' },
+  'Koninklijke Marechaussee': { color: 0x4B0082, emoji: '🎖️' },
+  'Dienst Speciale Interventies': { color: 0x000000, emoji: '🛡️' },
   'Rijkswaterstaat': { color: 0x00CED1, emoji: '🛣️' }
 };
 
@@ -57,8 +57,7 @@ client.once(Events.ClientReady, async () => {
       // Verplichte velden
       .addStringOption(o => o.setName('datum').setDescription('DD/MM/YYYY').setRequired(true))
       .addStringOption(o => o.setName('tijd').setDescription('HH:MM').setRequired(true))
-      .addStringOption(o => o.setName('Host').setDescription('Host naam').setRequired(true))
-      .addStringOption(o => o.setName('type-training').setDescription('Type training dat gegeven word').setRequired(true))
+      .addStringOption(o => o.setName('trainer').setDescription('Trainer naam').setRequired(true))
       .addStringOption(o => o.setName('dienst')
         .setDescription('Dienst voor training')
         .setRequired(true)
@@ -66,8 +65,8 @@ client.once(Events.ClientReady, async () => {
           { name: '🚑 Ambulance', value: 'Ambulance' },
           { name: '👮 Politie', value: 'Politie' },
           { name: '🚒 Brandweer', value: 'Brandweer' },
-          { name: '🎖️ KMar', value: 'KMar' },
-          { name: '🛡️ DSI', value: 'DSI' },
+          { name: '🎖️ Koninklijke Marechaussee', value: 'Koninklijke Marechaussee'},
+          { name: '🛡️ Dienst Speciale Interventies', value: 'Dienst Speciale Interventies' },
           { name: '🛣️ Rijkswaterstaat', value: 'Rijkswaterstaat' }
         ))
       .addStringOption(o => o.setName('onderwerp').setDescription('Onderwerp training').setRequired(true))
@@ -75,6 +74,7 @@ client.once(Events.ClientReady, async () => {
       .addStringOption(o => o.setName('cohost').setDescription('Co-host (optioneel)').setRequired(false))
       .addStringOption(o => o.setName('helpers').setDescription('Helpers (komma gescheiden, optioneel)').setRequired(false))
       .addStringOption(o => o.setName('opmerkingen').setDescription('Bijkomende opmerkingen (optioneel)').setRequired(false))
+      .addStringOption(o => o.setName('locatie').setDescription('Locatie in Roblox (optioneel)').setRequired(false))
       .addStringOption(o => o.setName('max_deelnemers').setDescription('Max aantal deelnemers (optioneel)').setRequired(false))
       .addStringOption(o => o.setName('benodigdheden').setDescription('Benodigdheden (optioneel)').setRequired(false)),
 
@@ -411,7 +411,7 @@ client.on(Events.InteractionCreate, async interaction => {
       .setDescription('**Bekijk alle trainingen op de website:**')
       .addFields(
         { name: '🌐 **Website Link**', value: 'https://bredathenetherlands.netlify.app/trainingen/', inline: false },
-        { name: '🚑 **Diensten**', value: 'Ambulance | Politie | Brandweer | KMar | DSI | Rijkswaterstaat', inline: false },
+        { name: '🚑 **Diensten**', value: 'Ambulance | Politie | Brandweer | Koninklijke Marechaussee | Dienst Speciale Interventies | Rijkswaterstaat', inline: false },
         { name: '📊 **Status Legenda**', value: '⏳ Niet gestart | 🔄 Bezig | ✅ Afgelopen | ❌ Geannuleerd | 📅 Uitgesteld | 📝 Gepland', inline: false },
         { name: '💡 **Tip**', value: 'Gebruik `/training` om een training toe te voegen', inline: false }
       )
@@ -446,7 +446,7 @@ client.on(Events.InteractionCreate, async interaction => {
           { name: '🎮 **Status**', value: '🔄 Bezig in Roblox', inline: true },
           { name: '👤 **Gestart door**', value: user.username, inline: true },
           { name: '🌐 **Website**', value: 'Training staat nu op website', inline: false },
-          { name: '🎯 **Roblox**', value: 'Spelers kunnen nu **DEELNEMEN** via het "2" knopje rechtsonder!', inline: false }
+          { name: '🎯 **Roblox**', value: 'Spelers kunnen nu **DEELNEMEN** via het knopje rechtsonder!', inline: false }
         )
         .setFooter({
           text: `Gestart door ${user.username}`,
@@ -495,7 +495,7 @@ client.on(Events.InteractionCreate, async interaction => {
         },
         {
           name: '🚑 **Diensten**',
-          value: 'Ambulance | Politie | Brandweer | KMar | DSI | Rijkswaterstaat',
+          value: 'Ambulance | Politie | Brandweer | Koninklijke Marechaussee | Dienst Speciale Interventie | Rijkswaterstaat',
           inline: false
         },
         {
@@ -530,7 +530,7 @@ client.on(Events.InteractionCreate, async interaction => {
         },
         {
           name: '🎮 **Roblox**',
-          value: 'Klik op "2" knopje rechtsonder om trainingen te zien en deel te nemen',
+          value: 'Klik op de knop rechts onder voor het training menu te openen.',
           inline: false
         }
       )
@@ -555,7 +555,7 @@ client.on(Events.InteractionCreate, async interaction => {
         { name: '🎮 **Start Roblox**', value: 'Werkt ✅', inline: true },
         { name: '🗑️ **Delete**', value: 'Werkt ✅', inline: true },
         { name: '📢 **Kanaal**', value: `<#${TRAINING_CHANNEL_ID}>`, inline: false },
-        { name: '🚑 **Diensten**', value: 'Ambulance, Politie, Brandweer, KMar, DSI, Rijkswaterstaat', inline: false },
+        { name: '🚑 **Diensten**', value: 'Ambulance, Politie, Brandweer, Koninklijke Marechaussee, Dienst Speciale Interventies, Rijkswaterstaat', inline: false },
         { name: '⚙️ **Status Opties**', value: '⏳ 🔄 ✅ ❌ 📅 📝', inline: false }
       )
       .setFooter({ text: 'Breda The Netherlands Roleplay' })
