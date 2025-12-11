@@ -54,9 +54,11 @@ client.once(Events.ClientReady, async () => {
     new SlashCommandBuilder()
       .setName('training')
       .setDescription('Voeg training toe (komt op website + Roblox)')
+      // Verplichte velden
       .addStringOption(o => o.setName('datum').setDescription('DD/MM/YYYY').setRequired(true))
       .addStringOption(o => o.setName('tijd').setDescription('HH:MM').setRequired(true))
-      .addStringOption(o => o.setName('trainer').setDescription('Trainer naam').setRequired(true))
+      .addStringOption(o => o.setName('Host').setDescription('Host naam').setRequired(true))
+      .addStringOption(o => o.setName('type-training').setDescription('Type training dat gegeven word').setRequired(true))
       .addStringOption(o => o.setName('dienst')
         .setDescription('Dienst voor training')
         .setRequired(true)
@@ -69,10 +71,10 @@ client.once(Events.ClientReady, async () => {
           { name: '🛣️ Rijkswaterstaat', value: 'Rijkswaterstaat' }
         ))
       .addStringOption(o => o.setName('onderwerp').setDescription('Onderwerp training').setRequired(true))
+      // Optionele velden
       .addStringOption(o => o.setName('cohost').setDescription('Co-host (optioneel)').setRequired(false))
       .addStringOption(o => o.setName('helpers').setDescription('Helpers (komma gescheiden, optioneel)').setRequired(false))
       .addStringOption(o => o.setName('opmerkingen').setDescription('Bijkomende opmerkingen (optioneel)').setRequired(false))
-      .addStringOption(o => o.setName('locatie').setDescription('Locatie in Roblox (optioneel)').setRequired(false))
       .addStringOption(o => o.setName('max_deelnemers').setDescription('Max aantal deelnemers (optioneel)').setRequired(false))
       .addStringOption(o => o.setName('benodigdheden').setDescription('Benodigdheden (optioneel)').setRequired(false)),
 
@@ -92,27 +94,6 @@ client.once(Events.ClientReady, async () => {
           { name: '📝 Gepland', value: 'upcoming' }
         )),
 
-    // NIEUW: Deelname controle
-    new SlashCommandBuilder()
-      .setName('traininglock')
-      .setDescription('Sluit of open deelname aan trainingen')
-      .addStringOption(o => o.setName('actie')
-        .setDescription('Wat wil je doen?')
-        .setRequired(true)
-        .addChoices(
-          { name: '🔒 Sluit ALLE trainingen', value: 'lock_all' },
-          { name: '🔓 Open ALLE trainingen', value: 'unlock_all' },
-          { name: '🔒 Sluit specifieke training', value: 'lock_training' },
-          { name: '🔓 Open specifieke training', value: 'unlock_training' }
-        ))
-      .addIntegerOption(o => o.setName('id')
-        .setDescription('Training ID (alleen bij lock/unlock training)')
-        .setRequired(false)),
-
-    new SlashCommandBuilder()
-      .setName('trainingstatus')
-      .setDescription('Check deelname status van trainingen'),
-
     new SlashCommandBuilder()
       .setName('trainingen')
       .setDescription('Bekijk trainingen op website'),
@@ -123,18 +104,18 @@ client.once(Events.ClientReady, async () => {
       .addIntegerOption(o => o.setName('id').setDescription('Training ID').setRequired(true)),
 
     new SlashCommandBuilder()
-      .setName('starttraining')
-      .setDescription('Start training in Roblox')
-      .addIntegerOption(o => o.setName('id').setDescription('Training ID').setRequired(true)),
-
-    new SlashCommandBuilder()
       .setName('help')
       .setDescription('Toon help menu'),
 
     new SlashCommandBuilder()
       .setName('botinfo')
-      .setDescription('Bot informatie')
+      .setDescription('Bot informatie'),
 
+    // NIEUW: Start training in Roblox
+    new SlashCommandBuilder()
+      .setName('starttraining')
+      .setDescription('Start training in Roblox')
+      .addIntegerOption(o => o.setName('id').setDescription('Training ID').setRequired(true))
   ].map(c => c.toJSON());
 
   try {
@@ -156,11 +137,14 @@ client.on(Events.InteractionCreate, async interaction => {
   if (commandName === 'training') {
     await interaction.deferReply();
 
+    // Verplichte velden
     const datum = options.getString('datum');
     const tijd = options.getString('tijd');
     const trainer = options.getString('trainer');
     const dienst = options.getString('dienst');
     const onderwerp = options.getString('onderwerp');
+    
+    // Optionele velden
     const cohost = options.getString('cohost') || null;
     const helpersInput = options.getString('helpers') || null;
     const opmerkingen = options.getString('opmerkingen') || null;
@@ -175,6 +159,7 @@ client.on(Events.InteractionCreate, async interaction => {
       });
     }
 
+    // Parse helpers
     let helpers = null;
     if (helpersInput) {
       helpers = helpersInput.split(',').map(h => h.trim()).filter(h => h.length > 0);
@@ -189,6 +174,7 @@ client.on(Events.InteractionCreate, async interaction => {
       status: 'not_started',
       toegevoegd_door: user.username,
       van_discord: true,
+      // Optionele velden - alleen toevoegen als ze bestaan
       ...(cohost && { co_host: cohost }),
       ...(helpers && helpers.length > 0 && { helpers: helpers }),
       ...(opmerkingen && { opmerkingen: opmerkingen }),
@@ -211,6 +197,7 @@ client.on(Events.InteractionCreate, async interaction => {
       const dienstInfo = DIENST_MAP[dienst] || { color: 0x7289DA, emoji: '🎯' };
       const training = response.data.training || trainingData;
 
+      // Hoofd embed voor gebruiker
       const embed = new EmbedBuilder()
         .setColor(dienstInfo.color)
         .setTitle(`${dienstInfo.emoji} ${dienst} TRAINING TOEGEVOEGD!`)
@@ -229,12 +216,30 @@ client.on(Events.InteractionCreate, async interaction => {
         })
         .setTimestamp();
 
-      if (cohost) embed.addFields({ name: '🤝 **Co-host**', value: cohost, inline: true });
-      if (helpers && helpers.length > 0) embed.addFields({ name: '👥 **Helpers**', value: helpers.join(', '), inline: true });
-      if (opmerkingen) embed.addFields({ name: '💡 **Opmerkingen**', value: opmerkingen, inline: false });
-      if (locatie) embed.addFields({ name: '📍 **Locatie (Roblox)**', value: locatie, inline: true });
-      if (maxDeelnemers) embed.addFields({ name: '👥 **Max deelnemers**', value: maxDeelnemers, inline: true });
-      if (benodigdheden) embed.addFields({ name: '🎒 **Benodigdheden**', value: benodigdheden, inline: false });
+      // Voeg optionele velden toe als ze bestaan
+      if (cohost) {
+        embed.addFields({ name: '🤝 **Co-host**', value: cohost, inline: true });
+      }
+
+      if (helpers && helpers.length > 0) {
+        embed.addFields({ name: '👥 **Helpers**', value: helpers.join(', '), inline: true });
+      }
+
+      if (opmerkingen) {
+        embed.addFields({ name: '💡 **Opmerkingen**', value: opmerkingen, inline: false });
+      }
+
+      if (locatie) {
+        embed.addFields({ name: '📍 **Locatie (Roblox)**', value: locatie, inline: true });
+      }
+
+      if (maxDeelnemers) {
+        embed.addFields({ name: '👥 **Max deelnemers**', value: maxDeelnemers, inline: true });
+      }
+
+      if (benodigdheden) {
+        embed.addFields({ name: '🎒 **Benodigdheden**', value: benodigdheden, inline: false });
+      }
 
       embed.addFields(
         { name: '🌐 **Website**', value: 'https://bredathenetherlands.netlify.app/trainingen/', inline: false },
@@ -261,11 +266,17 @@ client.on(Events.InteractionCreate, async interaction => {
             .setFooter({ text: 'Breda The Netherlands Roleplay' })
             .setTimestamp();
 
-          if (cohost) announceEmbed.addFields({ name: '🤝 **Co-host**', value: cohost, inline: true });
-          if (locatie) announceEmbed.addFields({ name: '📍 **Locatie**', value: locatie, inline: true });
+          // Voeg optionele velden toe aan aankondiging
+          if (cohost) {
+            announceEmbed.addFields({ name: '🤝 **Co-host**', value: cohost, inline: true });
+          }
+
+          if (locatie) {
+            announceEmbed.addFields({ name: '📍 **Locatie**', value: locatie, inline: true });
+          }
 
           await channel.send({
-            content: `**${dienstInfo.emoji} NIEUWE ${dienst} TRAINING!** ${statusInfo.emoji}`,
+            content: `**${dienstInfo.emoji} NIEUWE ${dienst} TRAINING!** ${statusInfo.emoji}\n<@&ROLE_ID_HIER>`, // Voeg role mention toe
             embeds: [announceEmbed]
           });
         }
@@ -290,89 +301,6 @@ client.on(Events.InteractionCreate, async interaction => {
     }
   }
 
-  // ========== /traininglock ==========
-  else if (commandName === 'traininglock') {
-    await interaction.deferReply();
-    
-    const actie = options.getString('actie');
-    const trainingId = options.getInteger('id');
-    
-    let bericht = "";
-    let color = 0x3498db;
-    
-    switch(actie) {
-      case 'lock_all':
-        bericht = "🔒 **ALLE TRAININGEN GESLOTEN**\nGeen enkele speler kan meer deelnemen aan trainingen.";
-        color = 0xe74c3c;
-        break;
-      case 'unlock_all':
-        bericht = "🔓 **ALLE TRAININGEN OPEN**\nSpelers kunnen weer deelnemen aan trainingen.";
-        color = 0x2ecc71;
-        break;
-      case 'lock_training':
-        if (!trainingId) {
-          bericht = "❌ Geef een Training ID op!";
-          color = 0xe74c3c;
-        } else {
-          bericht = `🔒 **TRAINING #${trainingId} GESLOTEN**\nDeelname is nu gesloten voor deze training.`;
-          color = 0xe74c3c;
-        }
-        break;
-      case 'unlock_training':
-        if (!trainingId) {
-          bericht = "❌ Geef een Training ID op!";
-          color = 0xe74c3c;
-        } else {
-          bericht = `🔓 **TRAINING #${trainingId} OPEN**\nDeelname is nu weer mogelijk voor deze training.`;
-          color = 0x2ecc71;
-        }
-        break;
-    }
-    
-    const embed = new EmbedBuilder()
-      .setColor(color)
-      .setTitle(actie.includes('lock') ? '🔒 Deelname Gesloten' : '🔓 Deelname Open')
-      .setDescription(bericht)
-      .addFields(
-        { name: '👤 Uitgevoerd door', value: user.username, inline: true },
-        { name: '🕐 Tijd', value: new Date().toLocaleTimeString(), inline: true }
-      )
-      .setFooter({ text: 'Deelname status wordt real-time doorgegeven aan Roblox' })
-      .setTimestamp();
-    
-    await interaction.editReply({ embeds: [embed] });
-    
-    // Stuur naar training kanaal
-    try {
-      const channel = await guild.channels.fetch(TRAINING_CHANNEL_ID);
-      if (channel?.isTextBased()) {
-        await channel.send({ 
-          content: `**${actie.includes('lock') ? '🔒' : '🔓'} DEELNAME ${actie.includes('lock') ? 'GESLOTEN' : 'OPEN'}**\n${bericht}`
-        });
-      }
-    } catch (e) {
-      console.log('⚠️ Kanaal error:', e.message);
-    }
-  }
-
-  // ========== /trainingstatus ==========
-  else if (commandName === 'trainingstatus') {
-    const embed = new EmbedBuilder()
-      .setColor(0x3498db)
-      .setTitle('📊 Training Deelname Status')
-      .setDescription('**Huidige status van training deelname:**')
-      .addFields(
-        { name: '🎮 Roblox Connectie', value: '✅ Actief', inline: true },
-        { name: '🔗 API Status', value: '✅ Online', inline: true },
-        { name: '💡 Gebruik', value: '`/traininglock` om deelname te sluiten/openen', inline: false },
-        { name: '📋 Commands', value: '`lock_all` - Sluit alle trainingen\n`unlock_all` - Open alle trainingen\n`lock_training id:123` - Sluit training #123\n`unlock_training id:123` - Open training #123', inline: false }
-      )
-      .setFooter({ text: 'Breda The Netherlands Roleplay' })
-      .setTimestamp();
-    
-    await interaction.reply({ embeds: [embed], ephemeral: true });
-  }
-
   // ========== /status ==========
   else if (commandName === 'status') {
     await interaction.deferReply();
@@ -390,7 +318,7 @@ client.on(Events.InteractionCreate, async interaction => {
     console.log(`🔄 Status update:`, updateData);
 
     try {
-      await axios.put(TRAINING_API, updateData, {
+      const response = await axios.put(TRAINING_API, updateData, {
         headers: { 'Content-Type': 'application/json' },
         timeout: 10000
       });
@@ -438,7 +366,7 @@ client.on(Events.InteractionCreate, async interaction => {
     const trainingId = options.getInteger('id');
 
     try {
-      await axios.delete(TRAINING_API, {
+      const response = await axios.delete(TRAINING_API, {
         data: { id: trainingId },
         headers: { 'Content-Type': 'application/json' },
         timeout: 10000
@@ -500,7 +428,8 @@ client.on(Events.InteractionCreate, async interaction => {
     const trainingId = options.getInteger('id');
 
     try {
-      await axios.put(TRAINING_API, {
+      // Update status naar in_progress
+      const response = await axios.put(TRAINING_API, {
         id: trainingId,
         status: 'in_progress',
         status_text: 'Bezig in Roblox'
@@ -509,7 +438,7 @@ client.on(Events.InteractionCreate, async interaction => {
       console.log(`🎮 Training gestart in Roblox: ID ${trainingId}`);
 
       const embed = new EmbedBuilder()
-        .setColor(0xf39c12)
+        .setColor(0xf39c12) // Oranje voor "bezig"
         .setTitle('🎮 **TRAINING GESTART IN ROBBLOX!**')
         .setDescription(`Training **#${trainingId}** is nu LIVE!`)
         .addFields(
@@ -527,6 +456,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
       await interaction.editReply({ embeds: [embed] });
 
+      // Stuur naar training kanaal
       try {
         const channel = await guild.channels.fetch(TRAINING_CHANNEL_ID);
         if (channel?.isTextBased()) {
@@ -564,13 +494,8 @@ client.on(Events.InteractionCreate, async interaction => {
           inline: false
         },
         {
-          name: '🔒 **`/traininglock`**',
-          value: 'Sluit of open deelname aan trainingen\n**Opties:** lock_all, unlock_all, lock_training, unlock_training',
-          inline: false
-        },
-        {
-          name: '📊 **`/trainingstatus`**',
-          value: 'Check deelname status van trainingen',
+          name: '🚑 **Diensten**',
+          value: 'Ambulance | Politie | Brandweer | KMar | DSI | Rijkswaterstaat',
           inline: false
         },
         {
@@ -591,6 +516,11 @@ client.on(Events.InteractionCreate, async interaction => {
         {
           name: '📚 **`/trainingen`**',
           value: 'Bekijk trainingen op website',
+          inline: false
+        },
+        {
+          name: '🤖 **`/botinfo`**',
+          value: 'Bot informatie',
           inline: false
         },
         {
@@ -621,11 +551,12 @@ client.on(Events.InteractionCreate, async interaction => {
         { name: '🤖 **Botnaam**', value: client.user.tag, inline: true },
         { name: '💾 **Database**', value: 'Netlify Functions', inline: true },
         { name: '🚑 **Diensten**', value: '6 diensten', inline: true },
-        { name: '🔒 **Deelname Controle**', value: '✅ Beschikbaar', inline: true },
         { name: '🔗 **Add Training**', value: 'Werkt ✅', inline: true },
         { name: '🎮 **Start Roblox**', value: 'Werkt ✅', inline: true },
         { name: '🗑️ **Delete**', value: 'Werkt ✅', inline: true },
-        { name: '📢 **Kanaal**', value: `<#${TRAINING_CHANNEL_ID}>`, inline: false }
+        { name: '📢 **Kanaal**', value: `<#${TRAINING_CHANNEL_ID}>`, inline: false },
+        { name: '🚑 **Diensten**', value: 'Ambulance, Politie, Brandweer, KMar, DSI, Rijkswaterstaat', inline: false },
+        { name: '⚙️ **Status Opties**', value: '⏳ 🔄 ✅ ❌ 📅 📝', inline: false }
       )
       .setFooter({ text: 'Breda The Netherlands Roleplay' })
       .setTimestamp();
